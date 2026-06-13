@@ -1,4 +1,25 @@
 export const en = {
+	// ── Undo ─────────────────────────────────────────────────────────────────
+	"undo.nothing": "Nothing to undo.",
+	"undo.source-not-found": "Undo failed: source file not found ({path})",
+	"undo.failed": "Undo failed: {error}",
+	"undo.restored": "Undo last extract: restored.",
+	"undo.restored-deleted": "Undo last extract: restored (deleted {count} note).",
+	"undo.restored-deleted-plural": "Undo last extract: restored (deleted {count} notes).",
+
+	// ── Filename prompt modal ─────────────────────────────────────────────────
+	"filename-prompt.title": "New note name",
+	"filename-prompt.label": "Filename",
+	"filename-prompt.create": "Create",
+	"filename-prompt.cancel": "Cancel",
+
+	// ── File / profile suggester placeholders ────────────────────────────────
+	"suggester.file-placeholder": "Choose a note to append to…",
+	"suggester.profile-placeholder": "Choose an extraction profile…",
+
+	// ── Extract failed (heading extractor) ───────────────────────────────────
+	"notice.heading-extract-failed": "Extract failed: {error}",
+
 	// ── Conflict resolution modal ────────────────────────────────────────────
 	"conflict.title": "Note already exists",
 	"conflict.desc": "A note named \"{name}.md\" already exists. What would you like to do?",

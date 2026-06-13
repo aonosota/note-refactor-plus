@@ -1,4 +1,5 @@
 import { App, FuzzySuggestModal, TFile } from "obsidian";
+import { t } from "../i18n";
 
 class FileSuggesterModal extends FuzzySuggestModal<TFile> {
 	private readonly resolve: (file: TFile) => void;
@@ -13,7 +14,7 @@ class FileSuggesterModal extends FuzzySuggestModal<TFile> {
 		super(app);
 		this.resolve = resolve;
 		this.reject = reject;
-		this.setPlaceholder("Choose a note to append to…");
+		this.setPlaceholder(t("suggester.file-placeholder"));
 	}
 
 	getItems(): TFile[] {

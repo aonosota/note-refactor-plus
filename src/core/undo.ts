@@ -1,10 +1,11 @@
 import { App, Notice, TFile } from "obsidian";
 import { UndoStack } from "./undo-stack";
+import { t } from "../i18n";
 
 export async function undoLastExtract(app: App, undoStack: UndoStack): Promise<void> {
 	const snapshot = undoStack.pop();
 	if (!snapshot) {
-		new Notice("Nothing to undo.");
+		new Notice(t("undo.nothing"));
 		return;
 	}
 
@@ -12,7 +13,7 @@ export async function undoLastExtract(app: App, undoStack: UndoStack): Promise<v
 		// Restore source file
 		const sourceFile = app.vault.getAbstractFileByPath(snapshot.sourceFilePath);
 		if (!(sourceFile instanceof TFile)) {
-			new Notice(`Undo failed: source file not found (${snapshot.sourceFilePath})`);
+			new Notice(t("undo.source-not-found", { path: snapshot.sourceFilePath }));
 			return;
 		}
 		await app.vault.modify(sourceFile, snapshot.sourceContentBefore);
@@ -25,7 +26,7 @@ export async function undoLastExtract(app: App, undoStack: UndoStack): Promise<v
 			}
 		}
 
-		// For append-existing: restore target file
+		// For append-existing or conflict-append: restore target file
 		if (snapshot.targetFilePath && snapshot.targetContentBefore !== undefined) {
 			const targetFile = app.vault.getAbstractFileByPath(snapshot.targetFilePath);
 			if (targetFile instanceof TFile) {
@@ -34,11 +35,16 @@ export async function undoLastExtract(app: App, undoStack: UndoStack): Promise<v
 		}
 
 		const count = snapshot.createdFilePaths.length;
-		const detail = count > 0 ? ` (deleted ${count} note${count > 1 ? "s" : ""})` : "";
-		new Notice(`Undo last extract: restored${detail}.`);
+		if (count === 0) {
+			new Notice(t("undo.restored"));
+		} else if (count === 1) {
+			new Notice(t("undo.restored-deleted", { count: String(count) }));
+		} else {
+			new Notice(t("undo.restored-deleted-plural", { count: String(count) }));
+		}
 	} catch (error) {
 		new Notice(
-			`Undo failed: ${error instanceof Error ? error.message : String(error)}`,
+			t("undo.failed", { error: error instanceof Error ? error.message : String(error) }),
 		);
 	}
 }

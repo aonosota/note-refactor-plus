@@ -292,7 +292,9 @@ async function doExtract(
 		return newFile;
 	} catch (error) {
 		new Notice(
-			`Extract failed: ${error instanceof Error ? error.message : String(error)}`,
+			t("notice.heading-extract-failed", {
+				error: error instanceof Error ? error.message : String(error),
+			}),
 		);
 		return null;
 	}

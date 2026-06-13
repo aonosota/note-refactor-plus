@@ -1,6 +1,27 @@
 import type { StringKey } from "./en";
 
 export const ja: Partial<Record<StringKey, string>> = {
+	// ── Undo ─────────────────────────────────────────────────────────────────
+	"undo.nothing": "元に戻す対象がありません。",
+	"undo.source-not-found": "元に戻せませんでした: ソースファイルが見つかりません ({path})",
+	"undo.failed": "元に戻せませんでした: {error}",
+	"undo.restored": "抽出を元に戻しました。",
+	"undo.restored-deleted": "抽出を元に戻しました（{count} 件のノートを削除）。",
+	"undo.restored-deleted-plural": "抽出を元に戻しました（{count} 件のノートを削除）。",
+
+	// ── Filename prompt modal ─────────────────────────────────────────────────
+	"filename-prompt.title": "新しいノートの名前",
+	"filename-prompt.label": "ファイル名",
+	"filename-prompt.create": "作成",
+	"filename-prompt.cancel": "キャンセル",
+
+	// ── File / profile suggester placeholders ────────────────────────────────
+	"suggester.file-placeholder": "追記先のノートを選択…",
+	"suggester.profile-placeholder": "抽出プロファイルを選択…",
+
+	// ── Extract failed (heading extractor) ───────────────────────────────────
+	"notice.heading-extract-failed": "抽出に失敗しました: {error}",
+
 	// ── Conflict resolution modal ────────────────────────────────────────────
 	"conflict.title": "ノートが既に存在します",
 	"conflict.desc": "「{name}.md」という名前のノートが既に存在します。どうしますか？",

@@ -2,6 +2,7 @@ import { App, Modal, Setting } from "obsidian";
 import { ExtractProfile } from "../types";
 import { sanitizeFilename } from "./filename";
 import { expandVariables, TemplateContext } from "./template";
+import { t } from "../i18n";
 
 /**
  * Resolves the basename (no extension) for the new note based on the profile's
@@ -61,33 +62,31 @@ class FilenamePromptModal extends Modal {
 	}
 
 	onOpen(): void {
-		this.titleEl.setText("New note name");
+		this.titleEl.setText(t("filename-prompt.title"));
 		new Setting(this.contentEl)
-			.setName("Filename")
+			.setName(t("filename-prompt.label"))
 			.addText((text) => {
 				text.setValue(this.value).onChange((v) => {
 					this.value = v;
 				});
-				// Submit on Enter
 				text.inputEl.addEventListener("keydown", (e) => {
 					if (e.key === "Enter") {
 						e.preventDefault();
 						this.submit();
 					}
 				});
-				// Focus the input
 				setTimeout(() => text.inputEl.focus(), 0);
 			});
 
 		new Setting(this.contentEl)
 			.addButton((btn) =>
 				btn
-					.setButtonText("Create")
+					.setButtonText(t("filename-prompt.create"))
 					.setCta()
 					.onClick(() => this.submit()),
 			)
 			.addButton((btn) =>
-				btn.setButtonText("Cancel").onClick(() => this.cancel()),
+				btn.setButtonText(t("filename-prompt.cancel")).onClick(() => this.cancel()),
 			);
 	}
 

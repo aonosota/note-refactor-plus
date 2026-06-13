@@ -1,5 +1,6 @@
 import { App, FuzzySuggestModal, FuzzyMatch } from "obsidian";
 import { ExtractProfile } from "../types";
+import { t } from "../i18n";
 
 export class ProfileSuggester extends FuzzySuggestModal<ExtractProfile> {
 	private readonly profiles: ExtractProfile[];
@@ -13,7 +14,7 @@ export class ProfileSuggester extends FuzzySuggestModal<ExtractProfile> {
 		super(app);
 		this.profiles = profiles;
 		this.onChoose = onChoose;
-		this.setPlaceholder("Choose an extraction profile…");
+		this.setPlaceholder(t("suggester.profile-placeholder"));
 	}
 
 	getItems(): ExtractProfile[] {
