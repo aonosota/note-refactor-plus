@@ -4,7 +4,7 @@ import { findAvailablePath } from "./filename";
 import { getSelectionInfo } from "./selection";
 import { applyTemplate, TemplateContext } from "./template";
 import { resolveFilename } from "./filename-rule";
-import { applyFrontmatter } from "./frontmatter";
+
 import { buildSourceReplacement } from "./extractor-helpers";
 import { applyContentTransforms } from "./content-transforms";
 import { appendToEnd, appendUnderHeading } from "./append";
@@ -60,10 +60,6 @@ export async function extractSelection(
 		};
 		const body = await applyTemplate(app, profile.templatePath, ctx);
 		const newFile = await app.vault.create(path, body);
-
-		if (profile.frontmatter.addSourceRef) {
-			await applyFrontmatter(app, newFile, profile.frontmatter, sourceFile);
-		}
 
 		if (profile.runTemplaterAfter) {
 			await runTemplaterOnFile(app, newFile);
@@ -164,10 +160,6 @@ export async function splitFromCursor(
 		};
 		const body = await applyTemplate(app, profile.templatePath, ctx);
 		const newFile = await app.vault.create(path, body);
-
-		if (profile.frontmatter.addSourceRef) {
-			await applyFrontmatter(app, newFile, profile.frontmatter, sourceFile);
-		}
 
 		if (profile.runTemplaterAfter) {
 			await runTemplaterOnFile(app, newFile);

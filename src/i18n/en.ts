@@ -170,10 +170,6 @@ export const en = {
 	"profile.template-file-placeholder": "templates/extract.md",
 	"profile.run-templater": "Run Templater after creation",
 	"profile.run-templater-desc": "Requires the Templater plugin.",
-	"profile.add-source-ref": "Add source reference",
-	"profile.add-source-ref-desc":
-		"Add a `source` property pointing back to the original note.",
-
 	// ── Profile editor — actions ──────────────────────────────────────────────
 	"profile.action.preview": "Preview",
 	"profile.action.cancel": "Cancel",

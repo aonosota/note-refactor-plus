@@ -427,14 +427,6 @@ export class ProfileEditorModal extends Modal {
 				}),
 			);
 
-		new Setting(el)
-			.setName(t("profile.add-source-ref"))
-			.setDesc(t("profile.add-source-ref-desc"))
-			.addToggle((tog) =>
-				tog.setValue(this.draft.frontmatter.addSourceRef).onChange((v) => {
-					this.draft.frontmatter.addSourceRef = v;
-				}),
-			);
 	}
 
 	private renderActions(el: HTMLElement): void {

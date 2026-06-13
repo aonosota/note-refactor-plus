@@ -31,10 +31,6 @@ export type TargetRule =
 			headingName: string;
 	  };
 
-export interface FrontmatterRule {
-	addSourceRef: boolean;
-}
-
 export interface ExtractProfile {
 	id: string;
 	name: string;
@@ -49,7 +45,6 @@ export interface ExtractProfile {
 	noteLinkTemplate: string;
 	extractMode: ExtractMode;
 	afterExtract: AfterExtract;
-	frontmatter: FrontmatterRule;
 	target: TargetRule;
 	conflictPolicy: ConflictPolicy;
 	runTemplaterAfter: boolean;

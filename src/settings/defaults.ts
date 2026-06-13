@@ -14,7 +14,6 @@ export function createDefaultProfile(
 		sourceReplacement: "link",
 		extractMode: "move",
 		afterExtract: "open",
-		frontmatter: { addSourceRef: false },
 		target: { mode: "new-note" },
 		conflictPolicy: "increment",
 		runTemplaterAfter: false,

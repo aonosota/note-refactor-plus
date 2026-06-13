@@ -174,10 +174,6 @@ export const ja: Partial<Record<StringKey, string>> = {
 	"profile.template-file-placeholder": "templates/extract.md",
 	"profile.run-templater": "作成後に Templater を実行",
 	"profile.run-templater-desc": "Templater プラグインが必要です。",
-	"profile.add-source-ref": "ソース参照を追加",
-	"profile.add-source-ref-desc":
-		"元のノートへの `source` プロパティを新規ノートの Frontmatter に追加します。",
-
 	// ── Profile editor — actions ──────────────────────────────────────────────
 	"profile.action.preview": "プレビュー",
 	"profile.action.cancel": "キャンセル",

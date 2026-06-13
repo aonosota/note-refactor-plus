@@ -2,7 +2,7 @@ import { App, Editor, HeadingCache, Notice, TFile, TFolder, normalizePath } from
 import { ExtractProfile } from "../types";
 import { sanitizeFilename, findAvailablePath } from "./filename";
 import { applyTemplate, TemplateContext } from "./template";
-import { applyFrontmatter } from "./frontmatter";
+
 import { resolveFilename } from "./filename-rule";
 import { buildSourceReplacement } from "./extractor-helpers";
 import { applyContentTransforms } from "./content-transforms";
@@ -242,10 +242,6 @@ async function doExtract(
 		};
 		const body = await applyTemplate(app, profile.templatePath, ctx);
 		const newFile = await app.vault.create(path, body);
-
-		if (profile.frontmatter.addSourceRef) {
-			await applyFrontmatter(app, newFile, profile.frontmatter, sourceFile);
-		}
 
 		if (profile.runTemplaterAfter) {
 			await runTemplaterOnFile(app, newFile);
