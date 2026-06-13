@@ -280,7 +280,6 @@ export class ProfileEditorModal extends Modal {
 						t("profile.destination.same-as-source"),
 					)
 					.addOption("fixed", t("profile.destination.fixed"))
-					.addOption("prompt", t("profile.destination.prompt"))
 					.setValue(this.draft.destination.mode)
 					.onChange((mode) => {
 						if (mode === "fixed") {
@@ -290,7 +289,7 @@ export class ProfileEditorModal extends Modal {
 							};
 						} else {
 							this.draft.destination = {
-								mode: mode as "same-as-source" | "prompt",
+								mode: mode as "same-as-source",
 							};
 						}
 						fixedPathEl.style.display = mode === "fixed" ? "" : "none";

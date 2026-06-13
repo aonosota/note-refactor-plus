@@ -189,7 +189,7 @@ function findParentHeading(
 async function resolveFolder(
 	profile: ExtractProfile,
 	sourceFile: TFile,
-): Promise<string | null> {
+): Promise<string> {
 	switch (profile.destination.mode) {
 		case "fixed":
 			return normalizePath(profile.destination.path);
@@ -197,9 +197,6 @@ async function resolveFolder(
 			const parent = sourceFile.parent?.path ?? "";
 			return parent === "/" ? "" : parent;
 		}
-		case "prompt":
-			new Notice(t("notice.destination-not-implemented"));
-			return null;
 	}
 }
 
@@ -223,7 +220,6 @@ async function doExtract(
 ): Promise<TFile | null> {
 	try {
 		const folder = await resolveFolder(profile, sourceFile);
-		if (folder === null) return null;
 		await ensureFolder(app, folder);
 
 		// Snapshot before any edits (only when not part of a bulk split)

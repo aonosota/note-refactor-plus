@@ -55,8 +55,6 @@ export const en = {
 	"notice.extract-failed": "Extract failed: {error}",
 	"notice.split-failed": "Split failed: {error}",
 	"notice.target-not-found": "Target file not found: {path}",
-	"notice.destination-not-implemented":
-		"Prompted destination is not implemented yet.",
 	"notice.profile-name-required": "Profile name is required.",
 	"notice.pattern-empty": "Filename pattern cannot be empty.",
 	"notice.template-not-found": "Warning: template file not found: {path}",
@@ -151,7 +149,6 @@ export const en = {
 	"profile.destination": "Destination",
 	"profile.destination.same-as-source": "Same folder as source note",
 	"profile.destination.fixed": "Fixed folder",
-	"profile.destination.prompt": "Prompt at runtime",
 	"profile.folder-path": "Folder path",
 	"profile.folder-path-desc":
 		"Path relative to vault root. Leave empty for vault root.",

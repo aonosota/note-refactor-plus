@@ -1,7 +1,6 @@
 export type DestinationRule =
 	| { mode: "fixed"; path: string }
-	| { mode: "same-as-source" }
-	| { mode: "prompt" };
+	| { mode: "same-as-source" };
 
 export type FilenameRule =
 	| { mode: "first-line" }

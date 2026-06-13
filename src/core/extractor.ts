@@ -28,7 +28,6 @@ export async function extractSelection(
 
 	try {
 		const folder = resolveDestinationFolder(profile, sourceFile);
-		if (folder === null) return null;
 		await ensureFolder(app, folder);
 
 		const basename = await resolveFilename(app, profile, selection.firstLine);
@@ -163,7 +162,6 @@ export async function splitFromCursor(
 		}
 
 		const folder = resolveDestinationFolder(profile, sourceFile);
-		if (folder === null) return null;
 		await ensureFolder(app, folder);
 
 		const resolution = await resolveConflict(app, folder, basename, profile.conflictPolicy);
@@ -303,7 +301,7 @@ async function appendSelectionToExisting(
 function resolveDestinationFolder(
 	profile: ExtractProfile,
 	sourceFile: TFile,
-): string | null {
+): string {
 	switch (profile.destination.mode) {
 		case "fixed":
 			return normalizePath(profile.destination.path);
@@ -311,9 +309,6 @@ function resolveDestinationFolder(
 			const parent = sourceFile.parent?.path ?? "";
 			return parent === "/" ? "" : parent;
 		}
-		case "prompt":
-			new Notice(t("notice.destination-not-implemented"));
-			return null;
 	}
 }
 

@@ -58,8 +58,6 @@ export const ja: Partial<Record<StringKey, string>> = {
 	"notice.extract-failed": "抽出に失敗しました: {error}",
 	"notice.split-failed": "分割に失敗しました: {error}",
 	"notice.target-not-found": "対象ファイルが見つかりません: {path}",
-	"notice.destination-not-implemented":
-		"実行時プロンプトによる保存先指定は未実装です。",
 	"notice.profile-name-required": "プロファイル名は必須です。",
 	"notice.pattern-empty": "ファイル名パターンを入力してください。",
 	"notice.template-not-found":
@@ -155,7 +153,6 @@ export const ja: Partial<Record<StringKey, string>> = {
 	"profile.destination": "保存先",
 	"profile.destination.same-as-source": "ソースノートと同じフォルダ",
 	"profile.destination.fixed": "固定フォルダ",
-	"profile.destination.prompt": "実行時に入力",
 	"profile.folder-path": "フォルダパス",
 	"profile.folder-path-desc":
 		"Vault ルートからの相対パス。空欄の場合は Vault ルートに保存。",
