@@ -33,7 +33,33 @@ export async function importNoteRefactorSettings(
 
 	let data: NoteRefactorData;
 	try {
-		data = JSON.parse(raw) as NoteRefactorData;
+		const parsed: unknown = JSON.parse(raw);
+		if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+			return null;
+		}
+		const obj = parsed as Record<string, unknown>;
+		data = {
+			fileNameTemplate:
+				typeof obj["fileNameTemplate"] === "string" ? obj["fileNameTemplate"] : undefined,
+			noteContentTemplate:
+				typeof obj["noteContentTemplate"] === "string"
+					? obj["noteContentTemplate"]
+					: undefined,
+			overwriteExistingNote:
+				typeof obj["overwriteExistingNote"] === "boolean"
+					? obj["overwriteExistingNote"]
+					: undefined,
+			noteLocation:
+				obj["noteLocation"] === "default" ||
+				obj["noteLocation"] === "root" ||
+				obj["noteLocation"] === "custom"
+					? obj["noteLocation"]
+					: undefined,
+			customFolder:
+				typeof obj["customFolder"] === "string" ? obj["customFolder"] : undefined,
+			newFileFolderPath:
+				typeof obj["newFileFolderPath"] === "string" ? obj["newFileFolderPath"] : undefined,
+		};
 	} catch {
 		return null;
 	}

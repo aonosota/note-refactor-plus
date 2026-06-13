@@ -3,6 +3,7 @@ import {
 	Modal,
 	Notice,
 	Setting,
+	TFile,
 	TextComponent,
 	setIcon,
 } from "obsidian";
@@ -82,7 +83,7 @@ export class ProfileEditorModal extends Modal {
 					try {
 						setIcon(iconPreview, v || "file-text");
 					} catch {
-						/* ignore unknown icon */
+						setIcon(iconPreview, "help-circle");
 					}
 				}),
 			);
@@ -90,7 +91,7 @@ export class ProfileEditorModal extends Modal {
 		try {
 			setIcon(iconPreview, this.draft.icon || "file-text");
 		} catch {
-			/* ignore */
+			setIcon(iconPreview, "help-circle");
 		}
 
 		new Setting(el)
@@ -467,8 +468,9 @@ export class ProfileEditorModal extends Modal {
 			const tplFile = this.app.vault.getAbstractFileByPath(
 				this.draft.templatePath,
 			);
-			if (!tplFile) {
+			if (!(tplFile instanceof TFile)) {
 				new Notice(t("notice.template-not-found", { path: this.draft.templatePath }));
+				return;
 			}
 		}
 		this.draft.name = name;
