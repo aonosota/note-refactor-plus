@@ -159,42 +159,6 @@
 	margin-bottom: 4px;
 }
 
-.nrp-fm-props-label {
-	margin-top: 0.8em;
-	margin-bottom: 0.3em;
-	font-size: 0.85em;
-	color: var(--text-muted);
-}
-
-.nrp-fm-props {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	margin-bottom: 6px;
-}
-
-.nrp-fm-prop-row {
-	display: flex;
-	gap: 4px;
-	align-items: center;
-}
-
-.nrp-fm-input {
-	flex: 1;
-	min-width: 0;
-}
-
-.nrp-fm-prop-del {
-	flex-shrink: 0;
-	padding: 0 6px;
-	color: var(--text-muted);
-	cursor: pointer;
-}
-
-.nrp-fm-prop-del:hover {
-	color: var(--text-error);
-}
-
 .nrp-editor-actions .setting-item {
 	border-top: 1px solid var(--background-modifier-border);
 	margin-top: 1em;

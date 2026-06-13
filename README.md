@@ -95,20 +95,14 @@ Each profile configures the following:
 | Append position | End of file / Under heading | Where in the target file the content is appended |
 | Heading name | Exact heading text | Required when Append position is Under heading |
 
-### Template
+### Template & frontmatter
 
 | Setting | Description |
 |---|---|
 | Template file | Path to a `.md` file used as the body template for the new note. Leave empty for plain content extraction. |
 | Run Templater after creation | Passes the new note through the [Templater](https://github.com/SilentVoid13/Templater) plugin immediately after creation. Requires Templater to be installed and enabled. |
 
-### Frontmatter
-
-| Setting | Description |
-|---|---|
-| Add source reference | Adds a `source` property to the new note pointing back to the original note |
-| Tags | Comma-separated tags added to the new note's frontmatter |
-| Custom properties | Arbitrary key-value pairs added to the new note's frontmatter. Values support the same template variables as Note link template. |
+> To add frontmatter properties (tags, source reference, custom keys) to extracted notes, include a YAML front matter block in your template file.
 
 ## Template variables
 
@@ -164,11 +158,6 @@ All CSS classes used by this plugin are prefixed with `nrp-`. You can override t
 | `.nrp-section-heading` | Section headings inside the profile editor |
 | `.nrp-icon-preview` | Live icon preview next to the icon name input |
 | `.nrp-setting-group` | Indented group of related settings (e.g. append-to-existing details) |
-| `.nrp-fm-props-label` | "Custom properties" label in the Frontmatter section |
-| `.nrp-fm-props` | Container for key-value property rows |
-| `.nrp-fm-prop-row` | Individual key-value property row |
-| `.nrp-fm-input` | Key or value input in a property row |
-| `.nrp-fm-prop-del` | Delete button for a property row |
 | `.nrp-editor-actions` | Bottom action bar (Preview / Cancel / Save) |
 | `.nrp-preview-modal` | Template preview modal |
 | `.nrp-preview-label` | Section label inside the preview modal |
@@ -282,9 +271,8 @@ MIT
 |---|---|
 | テンプレートファイル | 新規ノートの本文に使う `.md` テンプレートファイル（空欄でコンテンツのみ） |
 | 作成後に Templater を実行 | 新規ノート作成直後に [Templater](https://github.com/SilentVoid13/Templater) を実行（Templater プラグインが必要） |
-| ソース参照を追加 | 元のノートへの `source` プロパティを新規ノートの Frontmatter に追加 |
 
-> **Tags や Custom properties について**: Phase 9 以降、Frontmatter の Tags/Properties はプロファイル設定から削除されました。テンプレートファイルの YAML frontmatter ブロックに直接記述してください。
+> Frontmatter プロパティ（タグ・ソース参照・カスタムキーなど）を追加したい場合は、テンプレートファイルに YAML frontmatter ブロックを記述してください。
 
 ## テンプレート変数
 
