@@ -1,6 +1,8 @@
 import { App, Editor, HeadingCache, Notice, TFile, TFolder, normalizePath } from "obsidian";
 import { ExtractProfile } from "../types";
-import { sanitizeFilename, findAvailablePath } from "./filename";
+import { sanitizeFilename } from "./filename";
+import { resolveConflict } from "./conflict";
+import { appendToEnd } from "./append";
 import { applyTemplate, TemplateContext } from "./template";
 
 import { resolveFilename } from "./filename-rule";
@@ -228,9 +230,21 @@ async function doExtract(
 		const sourceContentBefore = undoStack ? editor.getValue() : "";
 
 		const { content, effectiveEndLine } = readRange(editor, range);
-		const path = findAvailablePath(app.vault, folder, basename);
 
-		const sourceLink = app.fileManager.generateMarkdownLink(sourceFile, path);
+		// In bulk mode (undoStack === null), always use increment to avoid modal
+		// prompts for every heading and to keep bulk-undo snapshots consistent.
+		const resolution = await resolveConflict(
+			app,
+			folder,
+			basename,
+			profile.conflictPolicy,
+			undoStack === null,
+		);
+		if (resolution.action === "cancel") return null;
+
+		const effectivePath =
+			resolution.action === "create" ? resolution.path : resolution.file.path;
+		const sourceLink = app.fileManager.generateMarkdownLink(sourceFile, effectivePath);
 		const transformedContent = applyContentTransforms(content, profile, "heading");
 		const ctx: TemplateContext = {
 			content: transformedContent,
@@ -241,10 +255,27 @@ async function doExtract(
 			heading: findParentHeading(allHeadings, range.heading),
 		};
 		const body = await applyTemplate(app, profile.templatePath, ctx);
-		const newFile = await app.vault.create(path, body);
 
-		if (profile.runTemplaterAfter) {
-			await runTemplaterOnFile(app, newFile);
+		let newFile: TFile;
+		if (resolution.action === "create") {
+			newFile = await app.vault.create(resolution.path, body);
+			if (profile.runTemplaterAfter) await runTemplaterOnFile(app, newFile);
+			undoStack?.push({
+				sourceFilePath: sourceFile.path,
+				sourceContentBefore,
+				createdFilePaths: [newFile.path],
+			});
+		} else {
+			newFile = resolution.file;
+			await appendToEnd(app, newFile, body);
+			if (profile.runTemplaterAfter) await runTemplaterOnFile(app, newFile);
+			undoStack?.push({
+				sourceFilePath: sourceFile.path,
+				sourceContentBefore,
+				createdFilePaths: [],
+				targetFilePath: newFile.path,
+				targetContentBefore: resolution.originalContent,
+			});
 		}
 
 		const link = app.fileManager.generateMarkdownLink(newFile, sourceFile.path);
@@ -254,12 +285,6 @@ async function doExtract(
 		if (replacement) {
 			editor.replaceRange(replacement, { line: range.startLine, ch: 0 });
 		}
-
-		undoStack?.push({
-			sourceFilePath: sourceFile.path,
-			sourceContentBefore,
-			createdFilePaths: [newFile.path],
-		});
 
 		if (profile.afterExtract !== "none") {
 			const leaf = app.workspace.getLeaf(

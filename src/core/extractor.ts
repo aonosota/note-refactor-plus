@@ -1,6 +1,6 @@
 import { App, Editor, Notice, TFile, TFolder, normalizePath } from "obsidian";
 import { ExtractProfile } from "../types";
-import { findAvailablePath } from "./filename";
+import { resolveConflict } from "./conflict";
 import { getSelectionInfo } from "./selection";
 import { applyTemplate, TemplateContext } from "./template";
 import { resolveFilename } from "./filename-rule";
@@ -47,8 +47,12 @@ export async function extractSelection(
 			);
 		}
 
-		const path = findAvailablePath(app.vault, folder, basename);
-		const sourceLink = app.fileManager.generateMarkdownLink(sourceFile, path);
+		const resolution = await resolveConflict(app, folder, basename, profile.conflictPolicy);
+		if (resolution.action === "cancel") return null;
+
+		const effectivePath =
+			resolution.action === "create" ? resolution.path : resolution.file.path;
+		const sourceLink = app.fileManager.generateMarkdownLink(sourceFile, effectivePath);
 		const transformedContent = applyContentTransforms(selection.content, profile);
 		const ctx: TemplateContext = {
 			content: transformedContent,
@@ -59,10 +63,27 @@ export async function extractSelection(
 			heading: selection.heading ?? "",
 		};
 		const body = await applyTemplate(app, profile.templatePath, ctx);
-		const newFile = await app.vault.create(path, body);
 
-		if (profile.runTemplaterAfter) {
-			await runTemplaterOnFile(app, newFile);
+		let newFile: TFile;
+		if (resolution.action === "create") {
+			newFile = await app.vault.create(resolution.path, body);
+			if (profile.runTemplaterAfter) await runTemplaterOnFile(app, newFile);
+			undoStack.push({
+				sourceFilePath: sourceFile.path,
+				sourceContentBefore,
+				createdFilePaths: [newFile.path],
+			});
+		} else {
+			newFile = resolution.file;
+			await appendToEnd(app, newFile, body);
+			if (profile.runTemplaterAfter) await runTemplaterOnFile(app, newFile);
+			undoStack.push({
+				sourceFilePath: sourceFile.path,
+				sourceContentBefore,
+				createdFilePaths: [],
+				targetFilePath: newFile.path,
+				targetContentBefore: resolution.originalContent,
+			});
 		}
 
 		const link = app.fileManager.generateMarkdownLink(newFile, sourceFile.path);
@@ -70,14 +91,12 @@ export async function extractSelection(
 			buildSourceReplacement(profile, link, selection.content, basename),
 		);
 
-		undoStack.push({
-			sourceFilePath: sourceFile.path,
-			sourceContentBefore,
-			createdFilePaths: [newFile.path],
-		});
-
 		await openAfterExtract(app, profile, newFile);
-		new Notice(t("notice.extracted-to", { path: newFile.path }));
+		new Notice(
+			resolution.action === "create"
+				? t("notice.extracted-to", { path: newFile.path })
+				: t("notice.appended-to", { path: newFile.path }),
+		);
 		return newFile;
 	} catch (error) {
 		new Notice(
@@ -147,8 +166,12 @@ export async function splitFromCursor(
 		if (folder === null) return null;
 		await ensureFolder(app, folder);
 
-		const path = findAvailablePath(app.vault, folder, basename);
-		const sourceLink = app.fileManager.generateMarkdownLink(sourceFile, path);
+		const resolution = await resolveConflict(app, folder, basename, profile.conflictPolicy);
+		if (resolution.action === "cancel") return null;
+
+		const effectivePath =
+			resolution.action === "create" ? resolution.path : resolution.file.path;
+		const sourceLink = app.fileManager.generateMarkdownLink(sourceFile, effectivePath);
 		const transformedContent = applyContentTransforms(rawContent, profile);
 		const ctx: TemplateContext = {
 			content: transformedContent,
@@ -159,23 +182,38 @@ export async function splitFromCursor(
 			heading: "",
 		};
 		const body = await applyTemplate(app, profile.templatePath, ctx);
-		const newFile = await app.vault.create(path, body);
 
-		if (profile.runTemplaterAfter) {
-			await runTemplaterOnFile(app, newFile);
+		let newFile: TFile;
+		if (resolution.action === "create") {
+			newFile = await app.vault.create(resolution.path, body);
+			if (profile.runTemplaterAfter) await runTemplaterOnFile(app, newFile);
+			undoStack.push({
+				sourceFilePath: sourceFile.path,
+				sourceContentBefore,
+				createdFilePaths: [newFile.path],
+			});
+		} else {
+			newFile = resolution.file;
+			await appendToEnd(app, newFile, body);
+			if (profile.runTemplaterAfter) await runTemplaterOnFile(app, newFile);
+			undoStack.push({
+				sourceFilePath: sourceFile.path,
+				sourceContentBefore,
+				createdFilePaths: [],
+				targetFilePath: newFile.path,
+				targetContentBefore: resolution.originalContent,
+			});
 		}
 
 		const link = app.fileManager.generateMarkdownLink(newFile, sourceFile.path);
 		replaceInSource(buildSourceReplacement(profile, link, rawContent, basename));
 
-		undoStack.push({
-			sourceFilePath: sourceFile.path,
-			sourceContentBefore,
-			createdFilePaths: [newFile.path],
-		});
-
 		await openAfterExtract(app, profile, newFile);
-		new Notice(t("notice.split-to", { path: newFile.path }));
+		new Notice(
+			resolution.action === "create"
+				? t("notice.split-to", { path: newFile.path })
+				: t("notice.appended-to", { path: newFile.path }),
+		);
 		return newFile;
 	} catch (error) {
 		new Notice(

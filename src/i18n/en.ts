@@ -1,4 +1,11 @@
 export const en = {
+	// ── Conflict resolution modal ────────────────────────────────────────────
+	"conflict.title": "Note already exists",
+	"conflict.desc": "A note named \"{name}.md\" already exists. What would you like to do?",
+	"conflict.increment": "Append number",
+	"conflict.append": "Append to existing",
+	"conflict.cancel": "Cancel",
+
 	// ── Context menu ────────────────────────────────────────────────────────
 	"ctx.extract-with": "Extract: {name}",
 	"ctx.choose-profile": "Extract: choose profile…",

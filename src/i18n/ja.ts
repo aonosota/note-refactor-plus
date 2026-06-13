@@ -1,6 +1,13 @@
 import type { StringKey } from "./en";
 
 export const ja: Partial<Record<StringKey, string>> = {
+	// ── Conflict resolution modal ────────────────────────────────────────────
+	"conflict.title": "ノートが既に存在します",
+	"conflict.desc": "「{name}.md」という名前のノートが既に存在します。どうしますか？",
+	"conflict.increment": "番号を付加",
+	"conflict.append": "既存ノートに追記",
+	"conflict.cancel": "キャンセル",
+
 	// ── Context menu ────────────────────────────────────────────────────────
 	"ctx.extract-with": "抽出: {name}",
 	"ctx.choose-profile": "抽出: プロファイルを選択…",
