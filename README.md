@@ -83,7 +83,7 @@ Each profile configures the following:
 
 | Setting | Values | Description |
 |---|---|---|
-| Destination | Same as source / Fixed folder / Prompt | Where the new note is saved |
+| Destination | Same as source / Fixed folder | Where the new note is saved |
 | Folder path | Vault-relative path | Used when Destination is Fixed folder. Empty = vault root. |
 
 ### Target
@@ -253,7 +253,7 @@ MIT
 
 | 項目 | 説明 |
 |---|---|
-| 保存先 | ソースノートと同じフォルダ / 固定フォルダ / 実行時に入力 |
+| 保存先 | ソースノートと同じフォルダ / 固定フォルダ |
 | フォルダパス | 固定フォルダ選択時に指定（Vault ルートからの相対パス） |
 
 ### ターゲット
