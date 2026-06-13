@@ -1,0 +1,24 @@
+{
+	"name": "note-refactor-plus",
+	"version": "0.1.0",
+	"description": "Extract selections or headings into new notes using multiple configurable profiles.",
+	"main": "main.js",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"lint": "eslint src"
+	},
+	"keywords": [],
+	"author": "aonosota",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/node": "^20.14.0",
+		"builtin-modules": "^3.3.0",
+		"esbuild": "^0.25.0",
+		"eslint": "^9.0.0",
+		"obsidian": "latest",
+		"tslib": "^2.6.0",
+		"typescript": "^5.5.0",
+		"typescript-eslint": "^8.0.0"
+	}
+}

@@ -1,0 +1,246 @@
+/* Note Refactor Plus — all classes are prefixed with nrp- */
+
+/* ============================================================
+   Profile list (settings tab)
+   ============================================================ */
+
+.nrp-profile-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.nrp-profile-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 10px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	background: var(--background-primary);
+	transition: background 0.1s;
+}
+
+.nrp-profile-item.nrp-dragging {
+	opacity: 0.45;
+	cursor: grabbing;
+}
+
+.nrp-profile-item.nrp-drag-over {
+	border-color: var(--interactive-accent);
+	background: var(--background-modifier-hover);
+}
+
+.nrp-drag-handle {
+	cursor: grab;
+	color: var(--text-faint);
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+}
+
+.nrp-drag-handle:active {
+	cursor: grabbing;
+}
+
+.nrp-profile-icon {
+	flex-shrink: 0;
+	width: 18px;
+	height: 18px;
+	color: var(--text-muted);
+	display: flex;
+	align-items: center;
+}
+
+.nrp-profile-info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.nrp-profile-name {
+	font-weight: var(--font-semibold);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.nrp-default-badge {
+	display: inline-block;
+	margin-left: 6px;
+	padding: 1px 5px;
+	border-radius: var(--radius-s);
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	font-size: 0.72em;
+	font-weight: var(--font-medium);
+	vertical-align: middle;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.nrp-profile-desc {
+	font-size: 0.82em;
+	color: var(--text-muted);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.nrp-reorder-btns {
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 0;
+}
+
+.nrp-reorder-btns button {
+	padding: 2px;
+	width: 20px;
+	height: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.nrp-profile-actions {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
+}
+
+.nrp-profile-actions button {
+	padding: 3px 6px;
+	font-size: 0.82em;
+}
+
+.nrp-btn-default-active {
+	color: var(--interactive-accent);
+	font-weight: var(--font-semibold);
+}
+
+/* ============================================================
+   Profile editor modal
+   ============================================================ */
+
+.nrp-profile-editor-modal {
+	width: min(640px, 92vw);
+}
+
+.nrp-profile-editor-modal .modal-content {
+	max-height: 80vh;
+	overflow-y: auto;
+	padding-bottom: 1em;
+}
+
+.nrp-section-heading {
+	margin-top: 1.4em;
+	margin-bottom: 0.2em;
+	font-size: 0.78em;
+	font-weight: var(--font-semibold);
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.07em;
+}
+
+.nrp-icon-preview {
+	display: flex;
+	align-items: center;
+	width: 22px;
+	height: 22px;
+	margin-left: 6px;
+	color: var(--text-normal);
+}
+
+.nrp-setting-group {
+	padding-left: 1em;
+	border-left: 2px solid var(--background-modifier-border);
+	margin-bottom: 4px;
+}
+
+.nrp-fm-props-label {
+	margin-top: 0.8em;
+	margin-bottom: 0.3em;
+	font-size: 0.85em;
+	color: var(--text-muted);
+}
+
+.nrp-fm-props {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-bottom: 6px;
+}
+
+.nrp-fm-prop-row {
+	display: flex;
+	gap: 4px;
+	align-items: center;
+}
+
+.nrp-fm-input {
+	flex: 1;
+	min-width: 0;
+}
+
+.nrp-fm-prop-del {
+	flex-shrink: 0;
+	padding: 0 6px;
+	color: var(--text-muted);
+	cursor: pointer;
+}
+
+.nrp-fm-prop-del:hover {
+	color: var(--text-error);
+}
+
+.nrp-editor-actions .setting-item {
+	border-top: 1px solid var(--background-modifier-border);
+	margin-top: 1em;
+	padding-top: 1em;
+	justify-content: flex-end;
+}
+
+.nrp-editor-actions .setting-item-info {
+	display: none;
+}
+
+/* ============================================================
+   Preview modal
+   ============================================================ */
+
+.nrp-preview-modal {
+	min-width: min(500px, 92vw);
+}
+
+.nrp-preview-label {
+	font-size: 0.82em;
+	font-weight: var(--font-semibold);
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	margin-top: 1em;
+	margin-bottom: 0.3em;
+}
+
+.nrp-preview-filename {
+	display: block;
+	padding: 4px 8px;
+	background: var(--background-secondary);
+	border-radius: var(--radius-s);
+	font-family: var(--font-monospace);
+	font-size: 0.9em;
+}
+
+.nrp-preview-body {
+	background: var(--background-secondary);
+	padding: 12px;
+	border-radius: var(--radius-m);
+	white-space: pre-wrap;
+	font-family: var(--font-monospace);
+	font-size: 0.85em;
+	overflow-x: auto;
+	max-height: 50vh;
+	overflow-y: auto;
+}

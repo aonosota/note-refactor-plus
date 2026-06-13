@@ -1,0 +1,9 @@
+{
+	"id": "note-refactor-plus",
+	"name": "Note Refactor Plus",
+	"version": "0.1.0",
+	"minAppVersion": "1.11.0",
+	"description": "Extract selections or headings into new notes using multiple configurable profiles (template, folder, filename rule, link style).",
+	"author": "aonosota",
+	"isDesktopOnly": false
+}

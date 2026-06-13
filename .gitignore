@@ -1,0 +1,10 @@
+node_modules/
+main.js
+*.js.map
+.DS_Store
+data.json
+
+# 内部ドキュメント
+実装記録.md
+実装計画.md
+note-refactor-plus-要件定義.md
