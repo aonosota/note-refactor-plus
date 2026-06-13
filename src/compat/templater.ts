@@ -6,12 +6,6 @@ interface TemplaterInternals {
 	};
 }
 
-export function isTemplaterAvailable(app: App): boolean {
-	const plugins = (app as unknown as { plugins?: { plugins?: Record<string, unknown> } })
-		.plugins?.plugins;
-	return plugins != null && "templater-obsidian" in plugins;
-}
-
 export async function runTemplaterOnFile(app: App, file: TFile): Promise<void> {
 	try {
 		const plugins = (
