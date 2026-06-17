@@ -83,6 +83,8 @@ export const ja: Partial<Record<StringKey, string>> = {
 	"notice.pattern-empty": "ファイル名パターンを入力してください。",
 	"notice.template-not-found":
 		"警告: テンプレートファイルが見つかりません: {path}",
+	"notice.template-no-content-var":
+		"テンプレートに {{content}} がありません。抽出テキストはテンプレートの末尾に自動追記されます。",
 
 	// ── Commands ─────────────────────────────────────────────────────────────
 	"cmd.extract-with-profile": "選択範囲を抽出（プロファイルを選択…）",

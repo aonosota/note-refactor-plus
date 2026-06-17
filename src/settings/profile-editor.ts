@@ -472,6 +472,11 @@ export class ProfileEditorModal extends Modal {
 				new Notice(t("notice.template-not-found", { path: this.draft.templatePath }));
 				return;
 			}
+			const raw = await this.app.vault.read(tplFile);
+			if (!raw.includes("{{content}}")) {
+				new Notice(t("notice.template-no-content-var"));
+				// Save proceeds — applyTemplate will append content automatically.
+			}
 		}
 		this.draft.name = name;
 		await this.onSave(this.draft);

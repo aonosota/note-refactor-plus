@@ -49,6 +49,9 @@ export function expandVariables(
 /**
  * Reads the template file from the vault and expands variables.
  * Falls back to plain `{{content}}` if templatePath is empty.
+ *
+ * If the template contains no `{{content}}` placeholder the extracted text is
+ * appended after the template body so it is never silently discarded.
  */
 export async function applyTemplate(
 	app: App,
@@ -63,7 +66,13 @@ export async function applyTemplate(
 		throw new Error(`Template file not found: ${templatePath}`);
 	}
 	const raw = await app.vault.read(file);
-	return expandVariables(raw, ctx);
+	const expanded = expandVariables(raw, ctx);
+
+	if (!raw.includes("{{content}}") && ctx.content) {
+		return expanded.trimEnd() + "\n\n" + ctx.content;
+	}
+
+	return expanded;
 }
 
 /**

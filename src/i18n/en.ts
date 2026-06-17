@@ -79,6 +79,8 @@ export const en = {
 	"notice.profile-name-required": "Profile name is required.",
 	"notice.pattern-empty": "Filename pattern cannot be empty.",
 	"notice.template-not-found": "Warning: template file not found: {path}",
+	"notice.template-no-content-var":
+		"Template has no {{content}} — extracted text will be appended after the template body.",
 
 	// ── Commands ─────────────────────────────────────────────────────────────
 	"cmd.extract-with-profile": "Extract selection (choose profile…)",
