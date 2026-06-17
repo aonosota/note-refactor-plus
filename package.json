@@ -1,6 +1,6 @@
 {
 	"name": "note-refactor-plus",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Extract selections or headings into new notes using multiple configurable profiles.",
 	"main": "main.js",
 	"scripts": {

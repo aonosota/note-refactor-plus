@@ -26,6 +26,12 @@ export async function extractSelection(
 		return null;
 	}
 
+	// Capture the selection range before any awaits. After async vault operations
+	// the editor selection may be lost (e.g. if a profile picker modal ran first),
+	// so we use replaceRange with explicit positions rather than replaceSelection.
+	const selectionFrom = editor.getCursor("from");
+	const selectionTo = editor.getCursor("to");
+
 	try {
 		const folder = resolveDestinationFolder(profile, sourceFile);
 		await ensureFolder(app, folder);
@@ -43,6 +49,7 @@ export async function extractSelection(
 				basename,
 				sourceContentBefore,
 				undoStack,
+				(text) => editor.replaceRange(text, selectionFrom, selectionTo),
 			);
 		}
 
@@ -86,8 +93,10 @@ export async function extractSelection(
 		}
 
 		const link = app.fileManager.generateMarkdownLink(newFile, sourceFile.path);
-		editor.replaceSelection(
+		editor.replaceRange(
 			buildSourceReplacement(profile, link, selection.content, basename),
+			selectionFrom,
+			selectionTo,
 		);
 
 		await openAfterExtract(app, profile, newFile);
