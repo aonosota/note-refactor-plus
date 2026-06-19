@@ -5,5 +5,6 @@
 	"minAppVersion": "1.11.0",
 	"description": "Extract selections or headings into new notes using multiple configurable profiles (template, folder, filename rule, link style).",
 	"author": "aonosota",
+	"authorUrl": "https://github.com/aonosota",
 	"isDesktopOnly": false
 }
