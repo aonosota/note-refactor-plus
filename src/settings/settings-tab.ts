@@ -48,7 +48,6 @@ export class NrpSettingsTab extends PluginSettingTab {
 				s
 					.setLimits(1, 10, 1)
 					.setValue(this.nrpPlugin.settings.contextMenuTopN)
-					.setDynamicTooltip()
 					.onChange(async (v) => {
 						this.nrpPlugin.settings.contextMenuTopN = v;
 						await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
@@ -244,7 +243,7 @@ export class NrpSettingsTab extends PluginSettingTab {
 		item.addEventListener("drop", (e) => {
 			e.preventDefault();
 			item.classList.remove("nrp-drag-over");
-			handlers.onDrop();
+			void handlers.onDrop();
 		});
 
 		// Profile icon
@@ -279,14 +278,14 @@ export class NrpSettingsTab extends PluginSettingTab {
 		});
 		setIcon(upBtn, "chevron-up");
 		if (isFirst) upBtn.setAttribute("disabled", "true");
-		else upBtn.addEventListener("click", () => handlers.onMoveUp());
+		else upBtn.addEventListener("click", () => void handlers.onMoveUp());
 
 		const downBtn = reorder.createEl("button", {
 			cls: "clickable-icon",
 		});
 		setIcon(downBtn, "chevron-down");
 		if (isLast) downBtn.setAttribute("disabled", "true");
-		else downBtn.addEventListener("click", () => handlers.onMoveDown());
+		else downBtn.addEventListener("click", () => void handlers.onMoveDown());
 
 		// Action buttons
 		const actions = item.createDiv("nrp-profile-actions");
@@ -296,7 +295,7 @@ export class NrpSettingsTab extends PluginSettingTab {
 			cls: isDefault ? "nrp-btn-default-active" : "",
 		});
 		if (!isDefault) {
-			defaultBtn.addEventListener("click", () => handlers.onSetDefault());
+			defaultBtn.addEventListener("click", () => void handlers.onSetDefault());
 		}
 
 		const editBtn = actions.createEl("button", {
@@ -311,7 +310,7 @@ export class NrpSettingsTab extends PluginSettingTab {
 			attr: { "aria-label": t("settings.duplicate") },
 		});
 		setIcon(dupBtn, "copy");
-		dupBtn.addEventListener("click", () => handlers.onDuplicate());
+		dupBtn.addEventListener("click", () => void handlers.onDuplicate());
 
 		const delBtn = actions.createEl("button", {
 			cls: "clickable-icon mod-warning",
@@ -319,6 +318,6 @@ export class NrpSettingsTab extends PluginSettingTab {
 		});
 		setIcon(delBtn, "trash-2");
 		if (isOnly) delBtn.setAttribute("disabled", "true");
-		else delBtn.addEventListener("click", () => handlers.onDelete());
+		else delBtn.addEventListener("click", () => void handlers.onDelete());
 	}
 }

@@ -4,12 +4,12 @@ import { t } from "../i18n";
 
 export class ProfileSuggester extends FuzzySuggestModal<ExtractProfile> {
 	private readonly profiles: ExtractProfile[];
-	private readonly onChoose: (profile: ExtractProfile) => void;
+	private readonly onChoose: (profile: ExtractProfile) => void | Promise<void>;
 
 	constructor(
 		app: App,
 		profiles: ExtractProfile[],
-		onChoose: (profile: ExtractProfile) => void,
+		onChoose: (profile: ExtractProfile) => void | Promise<void>,
 	) {
 		super(app);
 		this.profiles = profiles;
@@ -40,6 +40,6 @@ export class ProfileSuggester extends FuzzySuggestModal<ExtractProfile> {
 	}
 
 	onChooseItem(profile: ExtractProfile): void {
-		this.onChoose(profile);
+		void this.onChoose(profile);
 	}
 }

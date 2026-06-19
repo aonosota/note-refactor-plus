@@ -21,7 +21,7 @@ export async function importNoteRefactorSettings(
 	app: App,
 ): Promise<NoteRefactorImportResult | null> {
 	const dataPath = normalizePath(
-		".obsidian/plugins/note-refactor-obsidian/data.json",
+		`${app.vault.configDir}/plugins/note-refactor-obsidian/data.json`,
 	);
 
 	let raw: string;

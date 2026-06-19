@@ -1,4 +1,4 @@
-import { Editor, MarkdownFileInfo, MarkdownView, Menu, TFile } from "obsidian";
+import { Editor, MarkdownFileInfo, MarkdownView, Menu } from "obsidian";
 import { NrpPlugin } from "../commands";
 import {
 	profilesSortedByUsage,
@@ -16,7 +16,7 @@ export function registerContextMenu(plugin: NrpPlugin): void {
 			(menu: Menu, editor: Editor, info: MarkdownView | MarkdownFileInfo) => {
 				if (!plugin.settings.showContextMenu) return;
 
-				const file = info.file as TFile | null;
+				const file = info.file;
 				if (!file) return;
 
 				const sorted = profilesSortedByUsage(plugin.settings);

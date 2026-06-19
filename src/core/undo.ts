@@ -22,7 +22,7 @@ export async function undoLastExtract(app: App, undoStack: UndoStack): Promise<v
 		for (const path of snapshot.createdFilePaths) {
 			const file = app.vault.getAbstractFileByPath(path);
 			if (file instanceof TFile) {
-				await app.vault.delete(file);
+				await app.fileManager.trashFile(file);
 			}
 		}
 

@@ -61,11 +61,12 @@ function promptConflict(
 				});
 			},
 			onAppend: async () => {
-				const file = app.vault.getAbstractFileByPath(
+				const abstractFile = app.vault.getAbstractFileByPath(
 					joinNotePath(folder, basename),
-				) as TFile;
-				const originalContent = await app.vault.read(file);
-				resolve({ action: "append", file, originalContent });
+				);
+				if (!(abstractFile instanceof TFile)) return;
+				const originalContent = await app.vault.read(abstractFile);
+				resolve({ action: "append", file: abstractFile, originalContent });
 			},
 			onCancel: () => resolve({ action: "cancel" }),
 		}).open();

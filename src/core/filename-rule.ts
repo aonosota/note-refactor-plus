@@ -75,7 +75,7 @@ class FilenamePromptModal extends Modal {
 						this.submit();
 					}
 				});
-				setTimeout(() => text.inputEl.focus(), 0);
+				window.setTimeout(() => text.inputEl.focus(), 0);
 			});
 
 		new Setting(this.contentEl)

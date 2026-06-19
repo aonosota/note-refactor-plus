@@ -17,7 +17,7 @@ export default class NoteRefactorPlusPlugin extends Plugin {
 		this.addSettingTab(new NrpSettingsTab(this.app, this));
 	}
 
-	async onunload(): Promise<void> {
-		await saveSettings(this, this.settings);
+	onunload(): void {
+		void saveSettings(this, this.settings);
 	}
 }
