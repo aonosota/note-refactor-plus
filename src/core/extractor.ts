@@ -33,9 +33,6 @@ export async function extractSelection(
 	const selectionTo = editor.getCursor("to");
 
 	try {
-		const folder = resolveDestinationFolder(profile, sourceFile);
-		await ensureFolder(app, folder);
-
 		const basename = await resolveFilename(app, profile, selection.firstLine);
 		if (basename === null) return null; // user cancelled the filename prompt
 		const sourceContentBefore = await app.vault.read(sourceFile);
@@ -53,6 +50,9 @@ export async function extractSelection(
 				(text) => editor.replaceRange(text, selectionFrom, selectionTo),
 			);
 		}
+
+		const folder = resolveDestinationFolder(profile, sourceFile);
+		await ensureFolder(app, folder);
 
 		const resolution = await resolveConflict(app, folder, basename, profile.conflictPolicy);
 		if (resolution.action === "cancel") return null;
