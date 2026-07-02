@@ -1,4 +1,4 @@
-import { App, Modal, Setting, TFile } from "obsidian";
+import { App, Modal, Notice, Setting, TFile } from "obsidian";
 import { ConflictPolicy } from "../types";
 import { joinNotePath, findAvailablePath } from "./filename";
 import { t } from "../i18n";
@@ -64,7 +64,11 @@ function promptConflict(
 				const abstractFile = app.vault.getAbstractFileByPath(
 					joinNotePath(folder, basename),
 				);
-				if (!(abstractFile instanceof TFile)) return;
+				if (!(abstractFile instanceof TFile)) {
+					new Notice(t("notice.target-not-found", { path: joinNotePath(folder, basename) }));
+					resolve({ action: "cancel" });
+					return;
+				}
 				const originalContent = await app.vault.read(abstractFile);
 				resolve({ action: "append", file: abstractFile, originalContent });
 			},
