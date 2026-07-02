@@ -34,9 +34,14 @@ class FileSuggesterModal extends FuzzySuggestModal<TFile> {
 
 	onClose(): void {
 		super.onClose();
-		if (!this.chosen) {
-			this.reject(new Error("File selection cancelled"));
-		}
+		// onChooseItem is invoked synchronously by SuggestModal right after
+		// this.close() — but close() runs onClose() first. Defer the
+		// cancellation check so `chosen` has a chance to flip to true.
+		window.setTimeout(() => {
+			if (!this.chosen) {
+				this.reject(new Error("File selection cancelled"));
+			}
+		}, 0);
 	}
 }
 
