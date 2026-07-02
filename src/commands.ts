@@ -182,9 +182,14 @@ export function registerProfileCommand(
 		name: t("cmd.extract-profile", { name: profile.name }),
 		editorCallback: async (editor: Editor, ctx) => {
 			if (!ctx.file) return;
-			incrementUsage(plugin.settings, profile.id);
+			// Re-fetch by id rather than closing over `profile`: the settings array
+			// element is replaced wholesale when a profile is edited, so a captured
+			// reference would keep running the pre-edit configuration.
+			const current = getProfileById(plugin.settings, profile.id);
+			if (!current) return;
+			incrementUsage(plugin.settings, current.id);
 			await saveSettings(plugin, plugin.settings);
-			await extractSelection(plugin.app, profile, editor, ctx.file, plugin.undoStack);
+			await extractSelection(plugin.app, current, editor, ctx.file, plugin.undoStack);
 		},
 	});
 }

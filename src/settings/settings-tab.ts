@@ -163,6 +163,9 @@ export class NrpSettingsTab extends PluginSettingTab {
 						async (saved) => {
 							this.nrpPlugin.settings.profiles[i] = saved;
 							await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
+							// addCommand with the same id overwrites the previous
+							// registration, so this also picks up a renamed profile.
+							registerProfileCommand(this.nrpPlugin, saved);
 							this.display();
 						},
 					).open();
