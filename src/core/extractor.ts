@@ -142,9 +142,11 @@ export async function splitFromCursor(
 		return null;
 	}
 
-	// Helper: replace cursor-to-end with the given text
+	// Helper: replace cursor-to-end with the given text. Re-reads lineCount()
+	// at call time since the document may have changed while a filename
+	// prompt or conflict modal was open, invalidating a snapshot taken earlier.
 	const replaceInSource = (text: string): void => {
-		const lastLine = totalLines - 1;
+		const lastLine = editor.lineCount() - 1;
 		editor.replaceRange(
 			text,
 			{ line: cursorLine, ch: 0 },
@@ -152,8 +154,10 @@ export async function splitFromCursor(
 		);
 	};
 
+	const firstNonEmptyLine = lines.find((line) => line.trim().length > 0) ?? "";
+
 	try {
-		const basename = await resolveFilename(app, profile, lines[0]);
+		const basename = await resolveFilename(app, profile, firstNonEmptyLine);
 		if (basename === null) return null; // user cancelled the filename prompt
 		const sourceContentBefore = await app.vault.read(sourceFile);
 
