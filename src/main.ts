@@ -1,6 +1,6 @@
 import { Plugin } from "obsidian";
 import { NrpSettings } from "./types";
-import { loadSettings, saveSettings } from "./settings/settings";
+import { loadSettings } from "./settings/settings";
 import { registerCommands } from "./commands";
 import { UndoStack } from "./core/undo-stack";
 import { NrpSettingsTab } from "./settings/settings-tab";
@@ -15,9 +15,5 @@ export default class NoteRefactorPlusPlugin extends Plugin {
 		registerCommands(this);
 		registerContextMenu(this);
 		this.addSettingTab(new NrpSettingsTab(this.app, this));
-	}
-
-	onunload(): void {
-		void saveSettings(this, this.settings);
 	}
 }
