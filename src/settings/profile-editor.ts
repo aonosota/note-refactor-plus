@@ -206,7 +206,7 @@ export class ProfileEditorModal extends Modal {
 								mode: mode as "first-line" | "prompt",
 							};
 						}
-						patternEl.style.display = mode === "pattern" ? "" : "none";
+						patternEl.toggleClass("nrp-hidden", mode !== "pattern");
 					}),
 			);
 
@@ -226,8 +226,10 @@ export class ProfileEditorModal extends Modal {
 						this.draft.filenameRule = { mode: "pattern", pattern: v };
 					}),
 			).settingEl;
-		patternEl.style.display =
-			this.draft.filenameRule.mode === "pattern" ? "" : "none";
+		patternEl.toggleClass(
+			"nrp-hidden",
+			this.draft.filenameRule.mode !== "pattern",
+		);
 	}
 
 	private renderContentTransformsSection(el: HTMLElement): void {
@@ -296,7 +298,7 @@ export class ProfileEditorModal extends Modal {
 								mode: mode as "same-as-source",
 							};
 						}
-						fixedPathEl.style.display = mode === "fixed" ? "" : "none";
+						fixedPathEl.toggleClass("nrp-hidden", mode !== "fixed");
 					}),
 			);
 
@@ -314,8 +316,10 @@ export class ProfileEditorModal extends Modal {
 					});
 				new FolderSuggest(this.app, txt.inputEl);
 			}).settingEl;
-		fixedPathEl.style.display =
-			this.draft.destination.mode === "fixed" ? "" : "none";
+		fixedPathEl.toggleClass(
+			"nrp-hidden",
+			this.draft.destination.mode !== "fixed",
+		);
 	}
 
 	private renderTargetSection(el: HTMLElement): void {
@@ -352,13 +356,15 @@ export class ProfileEditorModal extends Modal {
 									: initAppend;
 							this.draft.target = { ...cur, mode: "append-existing" };
 						}
-						appendDetailsEl.style.display =
-							mode === "append-existing" ? "" : "none";
+						appendDetailsEl.toggleClass(
+							"nrp-hidden",
+							mode !== "append-existing",
+						);
 					}),
 			);
 
 		appendDetailsEl = el.createDiv("nrp-setting-group");
-		appendDetailsEl.style.display = initIsAppend ? "" : "none";
+		appendDetailsEl.toggleClass("nrp-hidden", !initIsAppend);
 
 		new Setting(appendDetailsEl)
 			.setName(t("profile.target-file"))
@@ -386,8 +392,10 @@ export class ProfileEditorModal extends Modal {
 						if (this.draft.target.mode === "append-existing") {
 							this.draft.target.position = pos as "end" | "under-heading";
 						}
-						headingNameEl.style.display =
-							pos === "under-heading" ? "" : "none";
+						headingNameEl.toggleClass(
+							"nrp-hidden",
+							pos !== "under-heading",
+						);
 					}),
 			);
 
@@ -401,8 +409,10 @@ export class ProfileEditorModal extends Modal {
 					}
 				}),
 			).settingEl;
-		headingNameEl.style.display =
-			initAppend.position === "under-heading" ? "" : "none";
+		headingNameEl.toggleClass(
+			"nrp-hidden",
+			initAppend.position !== "under-heading",
+		);
 	}
 
 	private renderTemplateSection(el: HTMLElement): void {

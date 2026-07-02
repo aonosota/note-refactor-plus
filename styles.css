@@ -1,5 +1,9 @@
 /* Note Refactor Plus — all classes are prefixed with nrp- */
 
+.nrp-hidden {
+	display: none;
+}
+
 /* ============================================================
    Profile list (settings tab)
    ============================================================ */
