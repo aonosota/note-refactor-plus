@@ -40,7 +40,7 @@ export interface ExtractProfile {
 	destination: DestinationRule;
 	filenameRule: FilenameRule;
 	sourceReplacement: SourceReplacement;
-	/** When non-empty, overrides sourceReplacement. Variables: {{title}}, {{link}}, {{content}}, {{date}}. */
+	/** When non-empty, overrides sourceReplacement. Variables: {{title}}, {{source_link}}, {{content}}, {{date}}. */
 	noteLinkTemplate: string;
 	extractMode: ExtractMode;
 	afterExtract: AfterExtract;
