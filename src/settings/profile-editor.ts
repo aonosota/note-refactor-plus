@@ -185,6 +185,7 @@ export class ProfileEditorModal extends Modal {
 		this.sectionHeading(el, "profile.section.filename");
 
 		let patternEl!: HTMLElement;
+		let patternInput!: TextComponent;
 
 		new Setting(el)
 			.setName(t("profile.filename-rule"))
@@ -199,8 +200,9 @@ export class ProfileEditorModal extends Modal {
 							const prev =
 								this.draft.filenameRule.mode === "pattern"
 									? this.draft.filenameRule.pattern
-									: t("profile.pattern-placeholder");
+									: "";
 							this.draft.filenameRule = { mode: "pattern", pattern: prev };
+							patternInput.setValue(prev);
 						} else {
 							this.draft.filenameRule = {
 								mode: mode as "first-line" | "prompt",
@@ -213,19 +215,20 @@ export class ProfileEditorModal extends Modal {
 		const initPattern =
 			this.draft.filenameRule.mode === "pattern"
 				? this.draft.filenameRule.pattern
-				: t("profile.pattern-placeholder");
+				: "";
 
 		patternEl = new Setting(el)
 			.setName(t("profile.pattern"))
 			.setDesc(t("profile.pattern-desc"))
-			.addText((txt) =>
+			.addText((txt) => {
+				patternInput = txt;
 				txt
 					.setPlaceholder(t("profile.pattern-placeholder"))
 					.setValue(initPattern)
 					.onChange((v) => {
 						this.draft.filenameRule = { mode: "pattern", pattern: v };
-					}),
-			).settingEl;
+					});
+			}).settingEl;
 		patternEl.toggleClass(
 			"nrp-hidden",
 			this.draft.filenameRule.mode !== "pattern",
