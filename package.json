@@ -15,7 +15,7 @@
 		"@types/node": "^20.14.0",
 		"esbuild": "^0.25.0",
 		"eslint": "^9.0.0",
-		"obsidian": "latest",
+		"obsidian": "1.13.1",
 		"tslib": "^2.6.0",
 		"typescript": "^5.5.0",
 		"typescript-eslint": "^8.0.0"
