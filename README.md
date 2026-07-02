@@ -20,7 +20,7 @@ Extract selected text or entire heading sections into new notes — using config
 
 ## Requirements
 
-- Obsidian **1.11.0** or later
+- Obsidian **1.13.1** or later
 - Desktop and mobile supported
 
 ## Getting started
@@ -63,7 +63,7 @@ Each profile configures the following:
 | Extract mode | Move / Copy | Move removes the text from the source; Copy keeps it |
 | Source replacement | Link / Embed / Nothing / Keep and append link | What replaces the extracted text in the source note |
 | Note link template | Template string | Custom replacement for the source note. Overrides Source replacement when set. Variables: `{{title}}`, `{{source_link}}`, `{{content}}`, `{{date:YYYYMMDD}}` |
-| After extract | Open / Open in new pane / Do nothing | What happens to the new note after creation |
+| After extract | Open / Open in new tab / Open in new pane / Do nothing | What happens to the new note after creation |
 | Conflict policy | Append number / Append to existing / Ask | How to handle a filename collision |
 
 ### Filename
