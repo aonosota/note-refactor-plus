@@ -57,7 +57,10 @@ export class ProfileEditorModal extends Modal {
 	// -------------------------------------------------------------------------
 
 	private sectionHeading(parent: HTMLElement, key: Parameters<typeof t>[0]): void {
-		parent.createEl("h3", { text: t(key), cls: "nrp-section-heading" });
+		new Setting(parent)
+			.setName(t(key))
+			.setHeading()
+			.settingEl.addClass("nrp-section-heading");
 	}
 
 	private renderBasicSection(el: HTMLElement): void {

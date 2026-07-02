@@ -134,9 +134,15 @@
 	padding-bottom: 1em;
 }
 
-.nrp-section-heading {
+.nrp-section-heading.setting-item {
 	margin-top: 1.4em;
 	margin-bottom: 0.2em;
+	border-top: none;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.nrp-section-heading .setting-item-name {
 	font-size: 0.78em;
 	font-weight: var(--font-semibold);
 	color: var(--text-muted);
