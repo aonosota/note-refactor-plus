@@ -10,6 +10,7 @@ import { buildSourceReplacement } from "./extractor-helpers";
 import { applyContentTransforms } from "./content-transforms";
 import { UndoStack } from "./undo-stack";
 import { runTemplaterOnFile } from "../compat/templater";
+import { openAfterExtract } from "./extractor";
 import { t } from "../i18n";
 
 interface HeadingRange {
@@ -72,7 +73,9 @@ export async function splitByHeadingLevel(
 	const created: TFile[] = [];
 	for (const range of ranges) {
 		const basename = sanitizeFilename(range.heading.heading);
-		// Pass null to skip per-extraction undo pushes; we push a single bulk snapshot below
+		// Pass null to skip per-extraction undo pushes; we push a single bulk snapshot below.
+		// suppressOpen=true: opening each note mid-loop would swap the shared editor's
+		// document out from under the next iteration's deleteRange, corrupting the source.
 		const file = await doExtract(
 			app,
 			profile,
@@ -82,6 +85,7 @@ export async function splitByHeadingLevel(
 			allHeadings,
 			basename,
 			null,
+			true,
 		);
 		if (file) created.unshift(file);
 	}
@@ -101,6 +105,8 @@ export async function splitByHeadingLevel(
 						: t("notice.split-notes-plural"),
 			}),
 		);
+		// Open the topmost created note once, after all edits to the source are done.
+		await openAfterExtract(app, profile, created[0]);
 	}
 	return created;
 }
@@ -217,6 +223,7 @@ async function doExtract(
 	allHeadings: HeadingCache[],
 	basename: string,
 	undoStack: UndoStack | null,
+	suppressOpen = false,
 ): Promise<TFile | null> {
 	try {
 		const folder = await resolveFolder(profile, sourceFile);
@@ -282,11 +289,8 @@ async function doExtract(
 			editor.replaceRange(replacement, { line: range.startLine, ch: 0 });
 		}
 
-		if (profile.afterExtract !== "none") {
-			const leaf = app.workspace.getLeaf(
-				profile.afterExtract === "open-new-pane" ? "split" : false,
-			);
-			await leaf.openFile(newFile);
+		if (!suppressOpen) {
+			await openAfterExtract(app, profile, newFile);
 		}
 
 		return newFile;

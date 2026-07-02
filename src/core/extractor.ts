@@ -329,7 +329,7 @@ async function ensureFolder(app: App, folder: string): Promise<void> {
 	await app.vault.createFolder(folder);
 }
 
-async function openAfterExtract(
+export async function openAfterExtract(
 	app: App,
 	profile: ExtractProfile,
 	file: TFile,
