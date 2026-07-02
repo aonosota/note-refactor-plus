@@ -7,12 +7,13 @@ import { t } from "../i18n";
 /**
  * Resolves the basename (no extension) for the new note based on the profile's
  * filenameRule. May open a prompt modal for `mode: "prompt"`.
+ * Returns null if the user cancels the prompt (no error — just abort silently).
  */
 export async function resolveFilename(
 	app: App,
 	profile: ExtractProfile,
 	firstLine: string,
-): Promise<string> {
+): Promise<string | null> {
 	switch (profile.filenameRule.mode) {
 		case "first-line":
 			return sanitizeFilename(firstLine);
@@ -38,22 +39,22 @@ export async function resolveFilename(
 	}
 }
 
-function promptFilename(app: App, defaultValue: string): Promise<string> {
-	return new Promise((resolve, reject) => {
-		new FilenamePromptModal(app, defaultValue, resolve, reject).open();
+function promptFilename(app: App, defaultValue: string): Promise<string | null> {
+	return new Promise((resolve) => {
+		new FilenamePromptModal(app, defaultValue, resolve, () => resolve(null)).open();
 	});
 }
 
 class FilenamePromptModal extends Modal {
 	private value: string;
 	private readonly onSubmit: (name: string) => void;
-	private readonly onCancel: (reason: unknown) => void;
+	private readonly onCancel: () => void;
 
 	constructor(
 		app: App,
 		defaultValue: string,
 		onSubmit: (name: string) => void,
-		onCancel: (reason: unknown) => void,
+		onCancel: () => void,
 	) {
 		super(app);
 		this.value = defaultValue;
@@ -93,7 +94,7 @@ class FilenamePromptModal extends Modal {
 	onClose(): void {
 		// If closed without submit (e.g. Escape), cancel
 		if (!this._submitted) {
-			this.onCancel(new Error("Cancelled"));
+			this.onCancel();
 		}
 	}
 
@@ -109,6 +110,6 @@ class FilenamePromptModal extends Modal {
 	private cancel(): void {
 		this._submitted = true;
 		this.close();
-		this.onCancel(new Error("Cancelled"));
+		this.onCancel();
 	}
 }

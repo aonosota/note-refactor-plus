@@ -37,6 +37,7 @@ export async function extractSelection(
 		await ensureFolder(app, folder);
 
 		const basename = await resolveFilename(app, profile, selection.firstLine);
+		if (basename === null) return null; // user cancelled the filename prompt
 		const sourceContentBefore = await app.vault.read(sourceFile);
 
 		if (profile.target.mode === "append-existing") {
@@ -153,6 +154,7 @@ export async function splitFromCursor(
 
 	try {
 		const basename = await resolveFilename(app, profile, lines[0]);
+		if (basename === null) return null; // user cancelled the filename prompt
 		const sourceContentBefore = await app.vault.read(sourceFile);
 
 		// append-existing branch

@@ -43,6 +43,7 @@ export async function extractHeadingAtCursor(
 		return null;
 	}
 	const basename = await resolveFilename(app, profile, range.heading.heading);
+	if (basename === null) return null; // user cancelled the filename prompt
 	return doExtract(app, profile, editor, sourceFile, range, headings, basename, undoStack);
 }
 
