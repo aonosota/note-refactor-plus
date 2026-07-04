@@ -56,6 +56,7 @@ export const ja: Partial<Record<StringKey, string>> = {
 	"settings.duplicate": "複製",
 	"settings.delete": "削除",
 	"settings.copy-suffix": " (コピー)",
+	"notice.cannot-delete-last-profile": "プロファイルは最低1つ必要です。",
 
 	// ── Notices ──────────────────────────────────────────────────────────────
 	"notice.import-success":

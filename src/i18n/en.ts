@@ -54,6 +54,7 @@ export const en = {
 	"settings.duplicate": "Duplicate",
 	"settings.delete": "Delete",
 	"settings.copy-suffix": " (copy)",
+	"notice.cannot-delete-last-profile": "At least one profile is required.",
 
 	// ── Notices ──────────────────────────────────────────────────────────────
 	"notice.import-success": "Imported Note Refactor settings as a new profile.",

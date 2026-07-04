@@ -75,7 +75,6 @@ export class ProfileEditorModal extends Modal {
 				}),
 			);
 
-		let iconPreview: HTMLElement;
 		const iconSetting = new Setting(el)
 			.setName(t("profile.icon"))
 			.setDesc(t("profile.icon-desc"))
@@ -90,7 +89,7 @@ export class ProfileEditorModal extends Modal {
 					}
 				}),
 			);
-		iconPreview = iconSetting.controlEl.createDiv("nrp-icon-preview");
+		const iconPreview = iconSetting.controlEl.createDiv("nrp-icon-preview");
 		try {
 			setIcon(iconPreview, this.draft.icon || "file-text");
 		} catch {
@@ -184,7 +183,6 @@ export class ProfileEditorModal extends Modal {
 	private renderFilenameSection(el: HTMLElement): void {
 		this.sectionHeading(el, "profile.section.filename");
 
-		let patternEl!: HTMLElement;
 		let patternInput!: TextComponent;
 
 		new Setting(el)
@@ -217,7 +215,7 @@ export class ProfileEditorModal extends Modal {
 				? this.draft.filenameRule.pattern
 				: "";
 
-		patternEl = new Setting(el)
+		const patternEl = new Setting(el)
 			.setName(t("profile.pattern"))
 			.setDesc(t("profile.pattern-desc"))
 			.addText((txt) => {
@@ -276,7 +274,6 @@ export class ProfileEditorModal extends Modal {
 	private renderDestinationSection(el: HTMLElement): void {
 		this.sectionHeading(el, "profile.section.destination");
 
-		let fixedPathEl!: HTMLElement;
 		const initFixed =
 			this.draft.destination.mode === "fixed" ? this.draft.destination.path : "";
 
@@ -306,7 +303,7 @@ export class ProfileEditorModal extends Modal {
 			);
 
 		let fixedPathInput!: TextComponent;
-		fixedPathEl = new Setting(el)
+		const fixedPathEl = new Setting(el)
 			.setName(t("profile.folder-path"))
 			.setDesc(t("profile.folder-path-desc"))
 			.addText((txt) => {
@@ -327,9 +324,6 @@ export class ProfileEditorModal extends Modal {
 
 	private renderTargetSection(el: HTMLElement): void {
 		this.sectionHeading(el, "profile.section.target");
-
-		let appendDetailsEl!: HTMLElement;
-		let headingNameEl!: HTMLElement;
 
 		const initIsAppend = this.draft.target.mode === "append-existing";
 		const initAppend: Extract<TargetRule, { mode: "append-existing" }> =
@@ -366,7 +360,7 @@ export class ProfileEditorModal extends Modal {
 					}),
 			);
 
-		appendDetailsEl = el.createDiv("nrp-setting-group");
+		const appendDetailsEl = el.createDiv("nrp-setting-group");
 		appendDetailsEl.toggleClass("nrp-hidden", !initIsAppend);
 
 		new Setting(appendDetailsEl)
@@ -402,7 +396,7 @@ export class ProfileEditorModal extends Modal {
 					}),
 			);
 
-		headingNameEl = new Setting(appendDetailsEl)
+		const headingNameEl = new Setting(appendDetailsEl)
 			.setName(t("profile.heading-name"))
 			.setDesc(t("profile.heading-name-desc"))
 			.addText((txt) =>

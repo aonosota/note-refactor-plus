@@ -1,4 +1,12 @@
-import { App, Notice, PluginSettingTab, Setting, setIcon } from "obsidian";
+import {
+	App,
+	Notice,
+	PluginSettingTab,
+	Setting,
+	SettingDefinitionItem,
+	SettingGroupItem,
+	setIcon,
+} from "obsidian";
 import { ExtractProfile } from "../types";
 import { NrpPlugin, registerProfileCommand, removeProfileCommand } from "../commands";
 import { saveSettings } from "./settings";
@@ -15,312 +23,203 @@ export class NrpSettingsTab extends PluginSettingTab {
 		this.nrpPlugin = plugin;
 	}
 
-	display(): void {
-		const { containerEl } = this;
-		containerEl.empty();
-
-		this.renderGlobalSettings(containerEl);
-		this.renderCompatibilitySection(containerEl);
-		this.renderProfileList(containerEl);
+	getSettingDefinitions(): SettingDefinitionItem[] {
+		return [
+			this.buildGlobalSettingsGroup(),
+			this.buildCompatibilityGroup(),
+			this.buildProfileList(),
+		];
 	}
 
 	// -------------------------------------------------------------------------
 
-	private renderGlobalSettings(el: HTMLElement): void {
-		new Setting(el).setName(t("settings.global-heading")).setHeading();
-
-		new Setting(el)
-			.setName(t("settings.show-context-menu"))
-			.setDesc(t("settings.show-context-menu-desc"))
-			.addToggle((tog) =>
-				tog
-					.setValue(this.nrpPlugin.settings.showContextMenu)
-					.onChange(async (v) => {
-						this.nrpPlugin.settings.showContextMenu = v;
-						await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
-					}),
-			);
-
-		new Setting(el)
-			.setName(t("settings.context-menu-items"))
-			.setDesc(t("settings.context-menu-items-desc"))
-			.addSlider((s) =>
-				s
-					.setLimits(1, 10, 1)
-					.setValue(this.nrpPlugin.settings.contextMenuTopN)
-					.onChange(async (v) => {
-						this.nrpPlugin.settings.contextMenuTopN = v;
-						await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
-					}),
-			);
+	private async persist(): Promise<void> {
+		await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
 	}
 
-	private renderCompatibilitySection(el: HTMLElement): void {
-		new Setting(el).setName(t("settings.compat-heading")).setHeading();
-
-		new Setting(el)
-			.setName(t("settings.import-nr"))
-			.setDesc(t("settings.import-nr-desc"))
-			.addButton((btn) =>
-				btn
-					.setButtonText(t("settings.import-nr-btn"))
-					.onClick(async () => {
-						let result: Awaited<ReturnType<typeof importNoteRefactorSettings>>;
-						try {
-							result = await importNoteRefactorSettings(this.app);
-						} catch {
-							new Notice(t("notice.import-failed"));
-							return;
-						}
-						if (!result) {
-							new Notice(t("notice.import-not-found"));
-							return;
-						}
-						this.nrpPlugin.settings.profiles.push(result.profile);
-						await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
-						registerProfileCommand(this.nrpPlugin, result.profile);
-						if (result.templateContent) {
-							new Notice(
-								t("notice.import-template-note", {
-									template: result.templateContent,
-								}),
-							);
-						}
-						new Notice(t("notice.import-success"));
-						this.display();
-					}),
-			);
+	private buildGlobalSettingsGroup(): SettingDefinitionItem {
+		return {
+			type: "group",
+			heading: t("settings.global-heading"),
+			items: [
+				{
+					name: t("settings.show-context-menu"),
+					desc: t("settings.show-context-menu-desc"),
+					control: {
+						type: "toggle",
+						key: "showContextMenu",
+					},
+				},
+				{
+					name: t("settings.context-menu-items"),
+					desc: t("settings.context-menu-items-desc"),
+					control: {
+						type: "slider",
+						key: "contextMenuTopN",
+						min: 1,
+						max: 10,
+						step: 1,
+					},
+				},
+			],
+		};
 	}
 
-	private renderProfileList(el: HTMLElement): void {
-		new Setting(el)
-			.setName(t("settings.profiles-heading"))
-			.setHeading()
-			.addButton((btn) =>
-				btn
-					.setButtonText(t("settings.add-profile"))
-					.setCta()
-					.onClick(() => {
-						const newProfile = createDefaultProfile({
-							id: crypto.randomUUID(),
-							name: t("settings.new-profile-name"),
-							description: "",
+	private buildCompatibilityGroup(): SettingDefinitionItem {
+		return {
+			type: "group",
+			heading: t("settings.compat-heading"),
+			items: [
+				{
+					name: t("settings.import-nr"),
+					desc: t("settings.import-nr-desc"),
+					render: (setting) => {
+						setting.addButton((btn) =>
+							btn.setButtonText(t("settings.import-nr-btn")).onClick(async () => {
+								let result: Awaited<ReturnType<typeof importNoteRefactorSettings>>;
+								try {
+									result = await importNoteRefactorSettings(this.app);
+								} catch {
+									new Notice(t("notice.import-failed"));
+									return;
+								}
+								if (!result) {
+									new Notice(t("notice.import-not-found"));
+									return;
+								}
+								this.nrpPlugin.settings.profiles.push(result.profile);
+								await this.persist();
+								registerProfileCommand(this.nrpPlugin, result.profile);
+								if (result.templateContent) {
+									new Notice(
+										t("notice.import-template-note", {
+											template: result.templateContent,
+										}),
+									);
+								}
+								new Notice(t("notice.import-success"));
+								this.update();
+							}),
+						);
+					},
+				},
+			],
+		};
+	}
+
+	private buildProfileList(): SettingDefinitionItem {
+		const profiles = this.nrpPlugin.settings.profiles;
+		return {
+			type: "list",
+			heading: t("settings.profiles-heading"),
+			onReorder: (oldIndex, newIndex) => {
+				const [moved] = this.nrpPlugin.settings.profiles.splice(oldIndex, 1);
+				this.nrpPlugin.settings.profiles.splice(newIndex, 0, moved);
+				void this.persist();
+				this.update();
+			},
+			onDelete: (index) => {
+				const list = this.nrpPlugin.settings.profiles;
+				if (list.length <= 1) {
+					new Notice(t("notice.cannot-delete-last-profile"));
+					this.update();
+					return;
+				}
+				const [removed] = list.splice(index, 1);
+				if (this.nrpPlugin.settings.defaultProfileId === removed.id) {
+					this.nrpPlugin.settings.defaultProfileId = list[0].id;
+				}
+				removeProfileCommand(this.nrpPlugin, removed.id);
+				void this.persist();
+				this.update();
+			},
+			addItem: {
+				name: t("settings.add-profile"),
+				action: () => {
+					const newProfile = createDefaultProfile({
+						id: crypto.randomUUID(),
+						name: t("settings.new-profile-name"),
+						description: "",
+					});
+					new ProfileEditorModal(this.app, newProfile, true, async (saved) => {
+						this.nrpPlugin.settings.profiles.push(saved);
+						await this.persist();
+						registerProfileCommand(this.nrpPlugin, saved);
+						this.update();
+					}).open();
+				},
+			},
+			items: profiles.map((profile, index) => this.buildProfileItem(profile, index)),
+		};
+	}
+
+	private buildProfileItem(profile: ExtractProfile, index: number): SettingGroupItem {
+		const isDefault = profile.id === this.nrpPlugin.settings.defaultProfileId;
+		return {
+			name: profile.name,
+			render: (setting: Setting) => {
+				setting.nameEl.empty();
+				const iconEl = setting.nameEl.createSpan("nrp-profile-icon");
+				try {
+					setIcon(iconEl, profile.icon || "file-text");
+				} catch {
+					setIcon(iconEl, "file-text");
+				}
+				setting.nameEl.createSpan({ text: profile.name });
+				if (isDefault) {
+					setting.nameEl.createSpan({
+						text: ` ${t("settings.default-badge")}`,
+						cls: "nrp-default-badge",
+					});
+				}
+				setting.setDesc(profile.description);
+
+				setting.addButton((btn) => {
+					btn.setButtonText(
+						isDefault ? t("settings.default-active") : t("settings.set-default"),
+					);
+					if (isDefault) {
+						btn.setDisabled(true);
+					} else {
+						btn.onClick(async () => {
+							this.nrpPlugin.settings.defaultProfileId = profile.id;
+							await this.persist();
+							this.update();
 						});
-						new ProfileEditorModal(
-							this.app,
-							newProfile,
-							true,
-							async (saved) => {
-								this.nrpPlugin.settings.profiles.push(saved);
-								await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
-								registerProfileCommand(this.nrpPlugin, saved);
-								this.display();
-							},
-						).open();
-					}),
-			);
-
-		const listEl = el.createDiv("nrp-profile-list");
-		let dragFromIndex: number | null = null;
-
-		this.nrpPlugin.settings.profiles.forEach((profile, i) => {
-			this.renderProfileItem(listEl, profile, i, {
-				onDragStart: () => {
-					dragFromIndex = i;
-				},
-				onDrop: async () => {
-					if (dragFromIndex === null || dragFromIndex === i) return;
-					const [moved] = this.nrpPlugin.settings.profiles.splice(dragFromIndex, 1);
-					this.nrpPlugin.settings.profiles.splice(i, 0, moved);
-					dragFromIndex = null;
-					await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
-					this.display();
-				},
-				onMoveUp: async () => {
-					if (i === 0) return;
-					const p = this.nrpPlugin.settings.profiles;
-					[p[i - 1], p[i]] = [p[i], p[i - 1]];
-					await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
-					this.display();
-				},
-				onMoveDown: async () => {
-					const p = this.nrpPlugin.settings.profiles;
-					if (i >= p.length - 1) return;
-					[p[i], p[i + 1]] = [p[i + 1], p[i]];
-					await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
-					this.display();
-				},
-				onSetDefault: async () => {
-					this.nrpPlugin.settings.defaultProfileId = profile.id;
-					await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
-					this.display();
-				},
-				onEdit: () => {
-					new ProfileEditorModal(
-						this.app,
-						profile,
-						false,
-						async (saved) => {
-							this.nrpPlugin.settings.profiles[i] = saved;
-							await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
-							// addCommand with the same id overwrites the previous
-							// registration, so this also picks up a renamed profile.
-							registerProfileCommand(this.nrpPlugin, saved);
-							this.display();
-						},
-					).open();
-				},
-				onDuplicate: async () => {
-					const copy = structuredClone(profile);
-					copy.id = crypto.randomUUID();
-					copy.name = `${profile.name}${t("settings.copy-suffix")}`;
-					this.nrpPlugin.settings.profiles.splice(i + 1, 0, copy);
-					await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
-					registerProfileCommand(this.nrpPlugin, copy);
-					this.display();
-				},
-				onDelete: async () => {
-					if (this.nrpPlugin.settings.profiles.length <= 1) return;
-					this.nrpPlugin.settings.profiles.splice(i, 1);
-					if (this.nrpPlugin.settings.defaultProfileId === profile.id) {
-						this.nrpPlugin.settings.defaultProfileId =
-							this.nrpPlugin.settings.profiles[0].id;
 					}
-					removeProfileCommand(this.nrpPlugin, profile.id);
-					await saveSettings(this.nrpPlugin, this.nrpPlugin.settings);
-					this.display();
-				},
-			});
-		});
-	}
+				});
 
-	private renderProfileItem(
-		listEl: HTMLElement,
-		profile: ExtractProfile,
-		index: number,
-		handlers: {
-			onDragStart: () => void;
-			onDrop: () => Promise<void>;
-			onMoveUp: () => Promise<void>;
-			onMoveDown: () => Promise<void>;
-			onSetDefault: () => Promise<void>;
-			onEdit: () => void;
-			onDuplicate: () => Promise<void>;
-			onDelete: () => Promise<void>;
-		},
-	): void {
-		const isDefault =
-			profile.id === this.nrpPlugin.settings.defaultProfileId;
-		const isFirst = index === 0;
-		const isLast =
-			index === this.nrpPlugin.settings.profiles.length - 1;
-		const isOnly = this.nrpPlugin.settings.profiles.length === 1;
+				setting.addExtraButton((btn) =>
+					btn
+						.setIcon("pencil")
+						.setTooltip(t("settings.edit"))
+						.onClick(() => {
+							new ProfileEditorModal(this.app, profile, false, async (saved) => {
+								this.nrpPlugin.settings.profiles[index] = saved;
+								await this.persist();
+								// addCommand with the same id overwrites the previous
+								// registration, so this also picks up a renamed profile.
+								registerProfileCommand(this.nrpPlugin, saved);
+								this.update();
+							}).open();
+						}),
+				);
 
-		const item = listEl.createDiv({ cls: "nrp-profile-item" });
-		item.setAttribute("draggable", "true");
-
-		// Drag handle
-		const handle = item.createDiv("nrp-drag-handle");
-		setIcon(handle, "grip-vertical");
-
-		// Drag events
-		item.addEventListener("dragstart", (e) => {
-			handlers.onDragStart();
-			if (e.dataTransfer) e.dataTransfer.effectAllowed = "move";
-			item.classList.add("nrp-dragging");
-		});
-		item.addEventListener("dragend", () => {
-			item.classList.remove("nrp-dragging");
-			listEl
-				.querySelectorAll(".nrp-drag-over")
-				.forEach((el) => el.classList.remove("nrp-drag-over"));
-		});
-		item.addEventListener("dragover", (e) => {
-			e.preventDefault();
-			if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
-			item.classList.add("nrp-drag-over");
-		});
-		item.addEventListener("dragleave", () => {
-			item.classList.remove("nrp-drag-over");
-		});
-		item.addEventListener("drop", (e) => {
-			e.preventDefault();
-			item.classList.remove("nrp-drag-over");
-			void handlers.onDrop();
-		});
-
-		// Profile icon
-		const iconEl = item.createDiv("nrp-profile-icon");
-		try {
-			setIcon(iconEl, profile.icon || "file-text");
-		} catch {
-			setIcon(iconEl, "file-text");
-		}
-
-		// Info
-		const info = item.createDiv("nrp-profile-info");
-		const nameEl = info.createEl("span", {
-			text: profile.name,
-			cls: "nrp-profile-name",
-		});
-		if (isDefault) {
-			nameEl.createEl("span", {
-				text: ` ${t("settings.default-badge")}`,
-				cls: "nrp-default-badge",
-			});
-		}
-		info.createEl("span", {
-			text: profile.description,
-			cls: "nrp-profile-desc",
-		});
-
-		// Up / down buttons
-		const reorder = item.createDiv("nrp-reorder-btns");
-		const upBtn = reorder.createEl("button", {
-			cls: "clickable-icon",
-		});
-		setIcon(upBtn, "chevron-up");
-		if (isFirst) upBtn.setAttribute("disabled", "true");
-		else upBtn.addEventListener("click", () => void handlers.onMoveUp());
-
-		const downBtn = reorder.createEl("button", {
-			cls: "clickable-icon",
-		});
-		setIcon(downBtn, "chevron-down");
-		if (isLast) downBtn.setAttribute("disabled", "true");
-		else downBtn.addEventListener("click", () => void handlers.onMoveDown());
-
-		// Action buttons
-		const actions = item.createDiv("nrp-profile-actions");
-
-		const defaultBtn = actions.createEl("button", {
-			text: isDefault ? t("settings.default-active") : t("settings.set-default"),
-			cls: isDefault ? "nrp-btn-default-active" : "",
-		});
-		if (!isDefault) {
-			defaultBtn.addEventListener("click", () => void handlers.onSetDefault());
-		}
-
-		const editBtn = actions.createEl("button", {
-			cls: "clickable-icon",
-			attr: { "aria-label": t("settings.edit") },
-		});
-		setIcon(editBtn, "pencil");
-		editBtn.addEventListener("click", () => handlers.onEdit());
-
-		const dupBtn = actions.createEl("button", {
-			cls: "clickable-icon",
-			attr: { "aria-label": t("settings.duplicate") },
-		});
-		setIcon(dupBtn, "copy");
-		dupBtn.addEventListener("click", () => void handlers.onDuplicate());
-
-		const delBtn = actions.createEl("button", {
-			cls: "clickable-icon mod-warning",
-			attr: { "aria-label": t("settings.delete") },
-		});
-		setIcon(delBtn, "trash-2");
-		if (isOnly) delBtn.setAttribute("disabled", "true");
-		else delBtn.addEventListener("click", () => void handlers.onDelete());
+				setting.addExtraButton((btn) =>
+					btn
+						.setIcon("copy")
+						.setTooltip(t("settings.duplicate"))
+						.onClick(async () => {
+							const copy = structuredClone(profile);
+							copy.id = crypto.randomUUID();
+							copy.name = `${profile.name}${t("settings.copy-suffix")}`;
+							this.nrpPlugin.settings.profiles.splice(index + 1, 0, copy);
+							await this.persist();
+							registerProfileCommand(this.nrpPlugin, copy);
+							this.update();
+						}),
+				);
+			},
+		};
 	}
 }
