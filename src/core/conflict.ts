@@ -1,6 +1,6 @@
 import { App, Modal, Notice, Setting, TFile } from "obsidian";
 import { ConflictPolicy } from "../types";
-import { joinNotePath, findAvailablePath } from "./filename";
+import { joinNotePath, findAvailablePath, findExistingFile } from "./filename";
 import { t } from "../i18n";
 
 export type ConflictResolution =
@@ -13,6 +13,10 @@ export type ConflictResolution =
  * Pass `fallbackToIncrement = true` in bulk operations to avoid modal prompts
  * for every heading and to keep bulk-undo snapshots consistent (they only
  * delete newly created files, not appended-to files).
+ *
+ * Collisions are detected the way the filesystem sees them (see
+ * {@link findExistingFile}), so on a case-insensitive OS an existing `Todo.md`
+ * counts as a collision for `todo.md`.
  */
 export async function resolveConflict(
 	app: App,
@@ -22,24 +26,32 @@ export async function resolveConflict(
 	fallbackToIncrement = false,
 ): Promise<ConflictResolution> {
 	const candidatePath = joinNotePath(folder, basename);
-	const existing = app.vault.getAbstractFileByPath(candidatePath);
+	const existing = await findExistingFile(app.vault, candidatePath);
 
-	if (!(existing instanceof TFile)) {
+	if (existing === null) {
 		return { action: "create", path: candidatePath };
 	}
 
-	const effectivePolicy = fallbackToIncrement ? "increment" : policy;
+	// Only a note can be appended to. If the path is occupied by a folder, or by
+	// something the vault index cannot resolve, the only safe option is a new name.
+	const existingFile = existing.file;
+	if (fallbackToIncrement || !(existingFile instanceof TFile)) {
+		return {
+			action: "create",
+			path: await findAvailablePath(app.vault, folder, basename),
+		};
+	}
 
-	switch (effectivePolicy) {
+	switch (policy) {
 		case "increment":
 			return {
 				action: "create",
-				path: findAvailablePath(app.vault, folder, basename),
+				path: await findAvailablePath(app.vault, folder, basename),
 			};
 
 		case "append": {
-			const originalContent = await app.vault.read(existing);
-			return { action: "append", file: existing, originalContent };
+			const originalContent = await app.vault.read(existingFile);
+			return { action: "append", file: existingFile, originalContent };
 		}
 
 		case "ask":
@@ -54,23 +66,23 @@ function promptConflict(
 ): Promise<ConflictResolution> {
 	return new Promise((resolve) => {
 		new ConflictModal(app, basename, {
-			onIncrement: () => {
+			onIncrement: async () => {
 				resolve({
 					action: "create",
-					path: findAvailablePath(app.vault, folder, basename),
+					path: await findAvailablePath(app.vault, folder, basename),
 				});
 			},
 			onAppend: async () => {
-				const abstractFile = app.vault.getAbstractFileByPath(
-					joinNotePath(folder, basename),
-				);
-				if (!(abstractFile instanceof TFile)) {
-					new Notice(t("notice.target-not-found", { path: joinNotePath(folder, basename) }));
+				const path = joinNotePath(folder, basename);
+				const existing = await findExistingFile(app.vault, path);
+				const file = existing?.file;
+				if (!(file instanceof TFile)) {
+					new Notice(t("notice.target-not-found", { path }));
 					resolve({ action: "cancel" });
 					return;
 				}
-				const originalContent = await app.vault.read(abstractFile);
-				resolve({ action: "append", file: abstractFile, originalContent });
+				const originalContent = await app.vault.read(file);
+				resolve({ action: "append", file, originalContent });
 			},
 			onCancel: () => resolve({ action: "cancel" }),
 		}).open();
@@ -78,7 +90,7 @@ function promptConflict(
 }
 
 interface ConflictHandlers {
-	onIncrement: () => void;
+	onIncrement: () => Promise<void>;
 	onAppend: () => Promise<void>;
 	onCancel: () => void;
 }
@@ -104,9 +116,9 @@ class ConflictModal extends Modal {
 			.addButton((btn) =>
 				btn
 					.setButtonText(t("conflict.increment"))
-					.onClick(() => {
+					.onClick(async () => {
 						this.close();
-						this.handlers.onIncrement();
+						await this.handlers.onIncrement();
 					}),
 			)
 			.addButton((btn) =>

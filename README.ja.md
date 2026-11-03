@@ -69,7 +69,7 @@
 | 項目 | 説明 |
 |---|---|
 | ファイル名ルール | コンテンツの1行目 / 実行時に入力 / パターン |
-| パターン | 変数: `{{title}}`, `{{date:YYYYMMDD}}`, `{{time:HHmm}}` |
+| パターン | 変数: `{{title}}`, `{{source_title}}`, `{{heading}}`, `{{date:YYYYMMDD}}`, `{{time:HHmm}}` |
 
 ### コンテンツ変換
 

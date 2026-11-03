@@ -151,7 +151,7 @@ export const en = {
 	"profile.filename-rule.pattern": "Pattern",
 	"profile.pattern": "Pattern",
 	"profile.pattern-desc":
-		"Variables: {{title}}, {{date:YYYYMMDD}}, {{time:HHmm}}",
+		"Variables: {{title}}, {{source_title}}, {{heading}}, {{date:YYYYMMDD}}, {{time:HHmm}}",
 	"profile.pattern-placeholder": "{{date:YYYYMMDD}}-{{title}}",
 
 	// ── Profile editor — content transforms ──────────────────────────────────

@@ -1,8 +1,20 @@
-import { App, Modal, Setting } from "obsidian";
+import { App, Modal, Setting, TFile } from "obsidian";
 import { ExtractProfile } from "../types";
 import { sanitizeFilename } from "./filename";
 import { expandVariables, TemplateContext } from "./template";
 import { t } from "../i18n";
+
+export interface ResolveFilenameOptions {
+	/** Source note; enables {{source_title}} / {{source_path}} in Pattern. */
+	sourceFile?: TFile;
+	/** Nearest/parent heading; enables {{heading}} in Pattern. */
+	heading?: string;
+	/**
+	 * Bulk operations (split by heading level) must not open a modal per
+	 * section, so `mode: "prompt"` falls back to the first-line behaviour.
+	 */
+	bulk?: boolean;
+}
 
 /**
  * Resolves the basename (no extension) for the new note based on the profile's
@@ -13,28 +25,26 @@ export async function resolveFilename(
 	app: App,
 	profile: ExtractProfile,
 	firstLine: string,
+	options: ResolveFilenameOptions = {},
 ): Promise<string | null> {
 	switch (profile.filenameRule.mode) {
 		case "first-line":
 			return sanitizeFilename(firstLine);
 		case "pattern": {
 			const now = new Date();
-			const minimalCtx: TemplateContext = {
+			const ctx: TemplateContext = {
 				content: "",
 				title: sanitizeFilename(firstLine),
 				sourceLink: "",
-				sourceTitle: "",
-				sourcePath: "",
-				heading: "",
+				sourceTitle: options.sourceFile?.basename ?? "",
+				sourcePath: options.sourceFile?.path ?? "",
+				heading: options.heading ?? "",
 			};
-			const raw = expandVariables(
-				profile.filenameRule.pattern,
-				minimalCtx,
-				now,
-			);
+			const raw = expandVariables(profile.filenameRule.pattern, ctx, now);
 			return sanitizeFilename(raw);
 		}
 		case "prompt":
+			if (options.bulk) return sanitizeFilename(firstLine);
 			return promptFilename(app, sanitizeFilename(firstLine));
 	}
 }

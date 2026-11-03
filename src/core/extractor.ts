@@ -4,6 +4,7 @@ import { resolveConflict } from "./conflict";
 import { getSelectionInfo } from "./selection";
 import { applyTemplate, TemplateContext } from "./template";
 import { resolveFilename } from "./filename-rule";
+import { findExistingFile } from "./filename";
 
 import { buildSourceReplacement } from "./extractor-helpers";
 import { applyContentTransforms } from "./content-transforms";
@@ -33,7 +34,10 @@ export async function extractSelection(
 	const selectionTo = editor.getCursor("to");
 
 	try {
-		const basename = await resolveFilename(app, profile, selection.firstLine);
+		const basename = await resolveFilename(app, profile, selection.firstLine, {
+			sourceFile,
+			heading: selection.heading,
+		});
 		if (basename === null) return null; // user cancelled the filename prompt
 		const sourceContentBefore = await app.vault.read(sourceFile);
 
@@ -157,7 +161,9 @@ export async function splitFromCursor(
 	const firstNonEmptyLine = lines.find((line) => line.trim().length > 0) ?? "";
 
 	try {
-		const basename = await resolveFilename(app, profile, firstNonEmptyLine);
+		const basename = await resolveFilename(app, profile, firstNonEmptyLine, {
+			sourceFile,
+		});
 		if (basename === null) return null; // user cancelled the filename prompt
 		const sourceContentBefore = await app.vault.read(sourceFile);
 
@@ -327,12 +333,17 @@ function resolveDestinationFolder(
 	}
 }
 
-async function ensureFolder(app: App, folder: string): Promise<void> {
+export async function ensureFolder(app: App, folder: string): Promise<void> {
 	if (!folder) return;
-	const existing = app.vault.getAbstractFileByPath(folder);
-	if (existing instanceof TFolder) return;
-	if (existing) throw new Error(`"${folder}" is a file, not a folder.`);
-	await app.vault.createFolder(folder);
+	const existing = await findExistingFile(app.vault, folder);
+	if (existing === null) {
+		await app.vault.createFolder(folder);
+		return;
+	}
+	// A case-variant folder (e.g. "Notes" vs "notes") on a case-insensitive OS is
+	// the same directory on disk, so creating it again would fail — reuse it.
+	if (existing.file === null || existing.file instanceof TFolder) return;
+	throw new Error(`"${folder}" is a file, not a folder.`);
 }
 
 export async function openAfterExtract(

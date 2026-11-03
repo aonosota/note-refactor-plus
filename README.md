@@ -71,7 +71,7 @@ Each profile configures the following:
 | Setting | Values | Description |
 |---|---|---|
 | Filename rule | First line / Prompt / Pattern | How the new note's filename is determined |
-| Pattern | Template string | Used when rule is Pattern. Variables: `{{title}}`, `{{date:YYYYMMDD}}`, `{{time:HHmm}}` |
+| Pattern | Template string | Used when rule is Pattern. Variables: `{{title}}`, `{{source_title}}`, `{{heading}}`, `{{date:YYYYMMDD}}`, `{{time:HHmm}}` |
 
 ### Content transforms
 

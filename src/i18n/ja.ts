@@ -155,7 +155,7 @@ export const ja: Partial<Record<StringKey, string>> = {
 	"profile.filename-rule.pattern": "パターン",
 	"profile.pattern": "パターン",
 	"profile.pattern-desc":
-		"変数: {{title}}, {{date:YYYYMMDD}}, {{time:HHmm}}",
+		"変数: {{title}}, {{source_title}}, {{heading}}, {{date:YYYYMMDD}}, {{time:HHmm}}",
 	"profile.pattern-placeholder": "{{date:YYYYMMDD}}-{{title}}",
 
 	// ── Profile editor — content transforms ──────────────────────────────────

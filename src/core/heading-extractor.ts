@@ -1,4 +1,4 @@
-import { App, Editor, HeadingCache, Notice, TFile, TFolder, normalizePath } from "obsidian";
+import { App, Editor, HeadingCache, Notice, TFile, normalizePath } from "obsidian";
 import { ExtractProfile } from "../types";
 import { sanitizeFilename } from "./filename";
 import { resolveConflict } from "./conflict";
@@ -10,7 +10,7 @@ import { buildSourceReplacement } from "./extractor-helpers";
 import { applyContentTransforms } from "./content-transforms";
 import { UndoStack } from "./undo-stack";
 import { runTemplaterOnFile } from "../compat/templater";
-import { openAfterExtract } from "./extractor";
+import { ensureFolder, openAfterExtract } from "./extractor";
 import { t } from "../i18n";
 
 interface HeadingRange {
@@ -42,7 +42,10 @@ export async function extractHeadingAtCursor(
 		new Notice(t("notice.cursor-in-heading"));
 		return null;
 	}
-	const basename = await resolveFilename(app, profile, range.heading.heading);
+	const basename = await resolveFilename(app, profile, range.heading.heading, {
+		sourceFile,
+		heading: findParentHeading(headings, range.heading),
+	});
 	if (basename === null) return null; // user cancelled the filename prompt
 	return doExtract(app, profile, editor, sourceFile, range, headings, basename, undoStack);
 }
@@ -73,7 +76,15 @@ export async function splitByHeadingLevel(
 
 	const created: TFile[] = [];
 	for (const range of ranges) {
-		const basename = sanitizeFilename(range.heading.heading);
+		// Respect the profile's filename rule (Pattern etc.), same as a single
+		// heading extraction. bulk=true keeps "prompt" from opening a modal per
+		// section; it never returns null then, the fallback only satisfies the type.
+		const basename =
+			(await resolveFilename(app, profile, range.heading.heading, {
+				sourceFile,
+				heading: findParentHeading(allHeadings, range.heading),
+				bulk: true,
+			})) ?? sanitizeFilename(range.heading.heading);
 		// Pass null to skip per-extraction undo pushes; we push a single bulk snapshot below.
 		// suppressOpen=true: opening each note mid-loop would swap the shared editor's
 		// document out from under the next iteration's deleteRange, corrupting the source.
@@ -205,14 +216,6 @@ function resolveFolder(
 			return parent === "/" ? "" : parent;
 		}
 	}
-}
-
-async function ensureFolder(app: App, folder: string): Promise<void> {
-	if (!folder) return;
-	const existing = app.vault.getAbstractFileByPath(folder);
-	if (existing instanceof TFolder) return;
-	if (existing) throw new Error(`"${folder}" is a file, not a folder.`);
-	await app.vault.createFolder(folder);
 }
 
 async function doExtract(
