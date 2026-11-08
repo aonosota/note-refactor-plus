@@ -100,9 +100,10 @@ function convertToProfile(data: NoteRefactorData): NoteRefactorImportResult {
 	const profile = createDefaultProfile(partial);
 
 	// If Note Refactor had a custom template content, surface it separately
-	const noteTemplate = (data.noteContentTemplate ?? "").trim();
-	const templateContent =
-		noteTemplate && noteTemplate !== "{{content}}" ? noteTemplate : undefined;
-
-	return { profile, templateContent };
+	// unescapes literal \n into actual newline chars
+	const noteTemplate = ((_c = data.noteContentTemplate) != null ? _c : "").trim();
+  	const unescapedTemplate = noteTemplate.replace(/\\n/g, "\n");
+  	const templateContent = unescapedTemplate && unescapedTemplate !== "{{content}}" ? unescapedTemplate : void 0;
+  
+  	return { profile, templateContent };
 }
