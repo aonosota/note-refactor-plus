@@ -28,34 +28,30 @@ export function applyContentTransforms(
 	profile: ExtractProfile,
 	ctx: TransformContext = "selection",
 ): string {
-	const lines = content.split("\n");
-	const firstLine = lines[0] ?? "";
-	let body = content;
-
-	// Step 1: exclude first line (selection only)
-	if (ctx === "selection" && profile.excludeFirstLine) {
-		const rest = lines.slice(1).join("\n");
-		body = rest.replace(/^\n+/, "");
-	}
-
-	// Step 2: normalize heading levels (both contexts)
-	if (profile.normalizeHeadings) {
-		body = normalizeHeadingLevels(body);
-	}
-
-	// Step 3: prepend first line as heading (selection only, applied after
-	// normalization so the chosen level is immune to promotion)
-	if (ctx === "selection" && profile.firstLineAsHeading !== "none") {
-		const prefix = headingPrefix[profile.firstLineAsHeading];
-		const headingText = firstLine.replace(/^#+\s*/, "").trim();
-		if (headingText) {
-			body = body
-				? `${prefix} ${headingText}\n${body}`
-				: `${prefix} ${headingText}`;
-		}
-	}
-
-	return body;
+	var _a;
+  	const lines = content.split("\n");
+  	const firstLine = (_a = lines[0]) != null ? _a : "";
+  	let body = content;
+  
+  	// Apply excludeFirstLine for both selections and heading extractions
+  	if (profile.excludeFirstLine) {
+    	const rest = lines.slice(1).join("\n");
+    	body = rest.replace(/^\n+/, "");
+  	}
+  
+  	if (profile.normalizeHeadings) {
+    	body = normalizeHeadingLevels(body);
+  	}
+  
+  	if (ctx === "selection" && profile.firstLineAsHeading !== "none") {
+    	const prefix = headingPrefix[profile.firstLineAsHeading];
+    	const headingText = firstLine.replace(/^#+\s*/, "").trim();
+    	if (headingText) {
+      	body = body ? `${prefix} ${headingText}\n${body}` : `${prefix} ${headingText}`;
+  	  }
+  	}
+  	return body;
+}
 }
 
 const headingPrefix: Record<"h1" | "h2" | "h3", string> = {
