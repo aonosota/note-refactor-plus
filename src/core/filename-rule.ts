@@ -27,6 +27,11 @@ export async function resolveFilename(
 	firstLine: string,
 	options: ResolveFilenameOptions = {},
 ): Promise<string | null> {
+	// Appending to an existing note never creates a file, so there is nothing to
+	// name: skip the prompt and just derive a title for {{title}} / link templates.
+	if (profile.target.mode === "append-existing") {
+		return sanitizeFilename(firstLine) || "Untitled";
+	}
 	switch (profile.filenameRule.mode) {
 		case "first-line":
 			return sanitizeFilename(firstLine);
