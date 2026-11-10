@@ -180,7 +180,12 @@ export class ProfileEditorModal extends Modal {
 			);
 	}
 
-	private renderFilenameSection(el: HTMLElement): void {
+	/** Wraps the filename section so it can be hidden when appending to an existing note. */
+	private filenameSectionEl!: HTMLElement;
+
+	private renderFilenameSection(parent: HTMLElement): void {
+		const el = (this.filenameSectionEl = parent.createDiv());
+		el.toggleClass("nrp-hidden", this.draft.target.mode === "append-existing");
 		this.sectionHeading(el, "profile.section.filename");
 
 		let patternInput!: TextComponent;
@@ -356,6 +361,10 @@ export class ProfileEditorModal extends Modal {
 						appendDetailsEl.toggleClass(
 							"nrp-hidden",
 							mode !== "append-existing",
+						);
+						this.filenameSectionEl.toggleClass(
+							"nrp-hidden",
+							mode === "append-existing",
 						);
 					}),
 			);
